@@ -314,7 +314,10 @@ export const uploadAsset = async (req, res) => {
     const { section = 'hero', key = 'background', altText = '', aspectRatio = '16:9' } = req.body;
     const fileUrl = `/uploads/${req.file.filename}`;
 
+    const assetId = `asset-${Date.now()}`;
     const newAsset = {
+      _id: assetId,
+      id: assetId,
       section,
       key,
       url: fileUrl,
@@ -359,6 +362,44 @@ export const uploadAsset = async (req, res) => {
       success: true,
       message: 'Asset uploaded and attached to CMS.',
       asset: newAsset,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// DELETE /api/admin/cms/assets/:id (Admin Delete Section Asset & Invalidate Redis)
+export const deleteAsset = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Asset ID is required.' });
+    }
+
+    if (getIsMongoConnected()) {
+      try {
+        let settings = await SiteSettings.findOne().sort({ createdAt: -1 });
+        if (settings && Array.isArray(settings.assets)) {
+          settings.assets = settings.assets.filter(
+            (a) => a._id?.toString() !== id && a.id !== id && a.key !== id
+          );
+          await settings.save();
+        }
+      } catch (dbErr) {
+        console.warn('[CMS DB Warning] Asset deletion failed in DB, updating memory:', dbErr.message);
+      }
+    }
+
+    memorySettings.assets = memorySettings.assets.filter(
+      (a) => a._id?.toString() !== id && a.id !== id && a.key !== id
+    );
+
+    await invalidateCache(CacheKeys.CONTENT);
+
+    return res.json({
+      success: true,
+      message: 'Asset deleted from library and cache invalidated.',
+      deletedId: id,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

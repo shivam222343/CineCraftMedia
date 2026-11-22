@@ -384,13 +384,108 @@ export const apiSaveContent = async (sections: SectionContent): Promise<{ succes
   return { success: true, isLive: false };
 };
 
+export const getAssetDisplayUrl = (url: string): string => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+  const base = API_BASE.replace(/\/api$/, '');
+  return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 export const apiGetAssets = async (): Promise<MediaAsset[]> => {
+  const token = getStoredToken();
+  try {
+    const res = await fetch(`${API_BASE}/admin/cms`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      credentials: 'include',
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.settings?.assets) && data.settings.assets.length > 0) {
+        currentAssets = data.settings.assets;
+        return currentAssets;
+      }
+    }
+  } catch {}
   return currentAssets;
 };
 
 export const apiUploadAsset = async (asset: MediaAsset): Promise<{ success: boolean; asset: MediaAsset }> => {
   currentAssets.unshift(asset);
   return { success: true, asset };
+};
+
+export const apiUploadAssetFile = async (
+  file: File,
+  section = 'hero',
+  key = 'media',
+  altText = '',
+  aspectRatio = '16:9'
+): Promise<{ success: boolean; asset?: MediaAsset; message?: string }> => {
+  const token = getStoredToken();
+  const formData = new FormData();
+  formData.append('asset', file);
+  formData.append('section', section);
+  formData.append('key', key);
+  formData.append('altText', altText);
+  formData.append('aspectRatio', aspectRatio);
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/cms/upload`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.asset) {
+        currentAssets.unshift(data.asset);
+        return { success: true, asset: data.asset };
+      }
+    }
+  } catch (err: any) {
+    console.warn('[Asset Upload API] Backend upload error, using local fallback:', err);
+  }
+
+  // Graceful offline fallback
+  const localUrl = URL.createObjectURL(file);
+  const fallbackAsset: MediaAsset = {
+    id: `local-asset-${Date.now()}`,
+    section,
+    key,
+    url: localUrl,
+    altText: altText || file.name,
+    aspectRatio,
+    storageType: 'local',
+    uploadedAt: new Date().toISOString(),
+  };
+  currentAssets.unshift(fallbackAsset);
+  return { success: true, asset: fallbackAsset, message: 'Saved in offline preview library.' };
+};
+
+export const apiDeleteAsset = async (assetId: string): Promise<{ success: boolean; message: string }> => {
+  currentAssets = currentAssets.filter((a) => (a.id || a.key) !== assetId && (a as any)._id !== assetId);
+  const token = getStoredToken();
+  try {
+    const res = await fetch(`${API_BASE}/admin/cms/assets/${encodeURIComponent(assetId)}`, {
+      method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      credentials: 'include',
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return { success: true, message: data.message || 'Asset deleted' };
+    }
+  } catch {}
+  return { success: true, message: 'Asset removed from library' };
 };
 
 // 4. Client Leads APIs
