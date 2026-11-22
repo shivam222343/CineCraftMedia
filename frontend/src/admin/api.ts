@@ -121,13 +121,14 @@ export const apiGetCurrentUser = async (): Promise<AdminUser | null> => {
 };
 
 export const apiAdminLogin = async (
-  email: string
+  email: string,
+  password?: string
 ): Promise<{ success: boolean; user?: AdminUser; token?: string; pendingApproval?: boolean; message?: string }> => {
   try {
     const res = await fetch(`${API_BASE}/auth/dev-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
     });
 
     const data = await res.json().catch(() => ({}));
@@ -231,6 +232,30 @@ export const apiLogout = async (): Promise<void> => {
     // Silent catch
   } finally {
     clearStoredToken();
+  }
+};
+
+export const apiSetPassword = async (
+  password: string
+): Promise<{ success: boolean; message: string }> => {
+  const token = getStoredToken();
+  try {
+    const res = await fetch(`${API_BASE}/auth/set-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ password }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) {
+      return { success: true, message: data.message || 'Password updated.' };
+    }
+    return { success: false, message: data.message || 'Failed to update password.' };
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Network error.' };
   }
 };
 

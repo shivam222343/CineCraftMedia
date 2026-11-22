@@ -21,6 +21,7 @@ export interface AdminUser {
   avatar?: string;
   role: AdminRole;
   lastLogin?: string;
+  passwordSet?: boolean;
 }
 
 export interface ThemeConfig {

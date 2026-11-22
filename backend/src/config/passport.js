@@ -41,6 +41,8 @@ export const configurePassport = () => {
 
             return done(null, false, {
               message: 'pending_approval',
+              email,
+              name: profile.displayName || email.split('@')[0],
             });
           }
 

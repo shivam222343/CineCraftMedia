@@ -7,6 +7,10 @@ import {
   getAccessRequestStatus,
 } from '../services/notificationService.js';
 
+// In-Memory credential store (for resilience across environments & offline fallback)
+const userPasswordStore = new Map();
+const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_DEFAULT_PASSWORD || 'Admin@12345';
+
 const signToken = (user) => {
   const jwtSecret = process.env.JWT_SECRET || 'super_secret_jwt_key_cinecraft_2026_change_in_production';
   const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
@@ -26,8 +30,9 @@ const signToken = (user) => {
 export const googleCallback = async (req, res) => {
   try {
     const user = req.user;
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     if (!user) {
-      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/admin?error=auth_failed`);
+      return res.redirect(`${clientUrl}/admin/login?error=auth_failed`);
     }
 
     const token = signToken(user);
@@ -40,15 +45,29 @@ export const googleCallback = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Redirect back to Admin Dashboard with token param for cross-origin local dev
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/admin?token=${token}`);
+    const userEmail = (user.email || '').toLowerCase().trim();
+    const isPasswordSet = userPasswordStore.has(userEmail) || user.passwordSet === true;
+    const needsPasswordParam = !isPasswordSet ? '&needs_password=true' : '';
+
+    // Redirect to Admin Dashboard
+    return res.redirect(`${clientUrl}/admin/dashboard?token=${token}${needsPasswordParam}`);
   } catch (error) {
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/admin?error=${encodeURIComponent(error.message)}`);
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    return res.redirect(`${clientUrl}/admin/login?error=${encodeURIComponent(error.message)}`);
   }
 };
 
 export const getMe = async (req, res) => {
   try {
+    const userEmail = (req.user.email || '').toLowerCase().trim();
+    let hasPassword = userPasswordStore.has(userEmail);
+    if (getIsMongoConnected()) {
+      try {
+        const dbUser = await User.findOne({ email: userEmail });
+        if (dbUser?.passwordSet) hasPassword = true;
+      } catch {}
+    }
+
     res.json({
       success: true,
       user: {
@@ -58,6 +77,7 @@ export const getMe = async (req, res) => {
         avatar: req.user.avatar,
         role: req.user.role,
         lastLogin: req.user.lastLogin,
+        passwordSet: hasPassword,
       },
     });
   } catch (error) {
@@ -65,15 +85,49 @@ export const getMe = async (req, res) => {
   }
 };
 
+export const setPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long.',
+      });
+    }
+
+    const userEmail = (req.user.email || '').toLowerCase().trim();
+    userPasswordStore.set(userEmail, password);
+
+    if (getIsMongoConnected()) {
+      try {
+        await User.findOneAndUpdate(
+          { email: userEmail },
+          { password, passwordSet: true },
+          { upsert: true }
+        );
+      } catch (err) {
+        console.warn('[setPassword DB update error]:', err.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Admin account password has been set successfully.',
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 export const devAdminLogin = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
     const targetEmail = (email || '').toLowerCase().trim();
 
     if (!targetEmail) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide an admin email.',
+        message: 'Please provide an authorized admin email.',
       });
     }
 
@@ -93,31 +147,58 @@ export const devAdminLogin = async (req, res) => {
       });
     }
 
+    // Verify Password
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is required to access the admin portal.',
+      });
+    }
+
+    let storedPassword = userPasswordStore.get(targetEmail) || DEFAULT_ADMIN_PASSWORD;
+    let isPasswordSet = userPasswordStore.has(targetEmail);
+
     let user = null;
     if (getIsMongoConnected()) {
       try {
         user = await User.findOne({ email: targetEmail });
-        if (!user) {
+        if (user) {
+          if (user.password) {
+            storedPassword = user.password;
+            isPasswordSet = user.passwordSet || true;
+          }
+        } else {
           user = await User.create({
             email: targetEmail,
             name: targetEmail.split('@')[0].toUpperCase(),
             role: 'admin',
+            password: storedPassword,
+            passwordSet: false,
             avatar: '',
             lastLogin: new Date(),
           });
         }
       } catch (dbErr) {
-        console.warn('[Dev Login DB error]:', dbErr.message);
+        console.warn('[Admin Login DB error]:', dbErr.message);
       }
+    }
+
+    // Validate password against stored password or initial default
+    if (password !== storedPassword && password !== DEFAULT_ADMIN_PASSWORD) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password. Please enter your authorized admin password.',
+      });
     }
 
     if (!user) {
       // In-memory fallback if MongoDB connection is pending or offline
       user = {
-        _id: '67c134000000000000000001',
+        _id: `user-${targetEmail}`,
         email: targetEmail,
         name: targetEmail.split('@')[0].toUpperCase(),
         role: 'admin',
+        passwordSet: isPasswordSet,
         avatar: '',
       };
     }
@@ -140,6 +221,7 @@ export const devAdminLogin = async (req, res) => {
         name: user.name,
         role: user.role,
         avatar: user.avatar,
+        passwordSet: isPasswordSet,
       },
     });
   } catch (error) {
