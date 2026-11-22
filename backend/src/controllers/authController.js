@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { getIsMongoConnected } from '../config/db.js';
-import { isEmailApproved, createAccessRequest } from '../services/notificationService.js';
+import {
+  isEmailApproved,
+  createAccessRequest,
+  getAccessRequestStatus,
+} from '../services/notificationService.js';
 
 const signToken = (user) => {
   const jwtSecret = process.env.JWT_SECRET || 'super_secret_jwt_key_cinecraft_2026_change_in_production';
@@ -146,4 +150,92 @@ export const devAdminLogin = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie('cinecraft_token');
   res.json({ success: true, message: 'Logged out successfully.' });
+};
+
+export const requestAccess = async (req, res) => {
+  try {
+    const { email, name, message } = req.body;
+    const cleanEmail = (email || '').toLowerCase().trim();
+
+    if (!cleanEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required to submit an access request.',
+      });
+    }
+
+    if (isEmailApproved(cleanEmail)) {
+      let user = {
+        id: `user-${cleanEmail}`,
+        email: cleanEmail,
+        name: name || cleanEmail.split('@')[0].toUpperCase(),
+        role: 'admin',
+        avatar: '',
+      };
+      const token = signToken(user);
+      return res.json({
+        success: true,
+        status: 'approved',
+        token,
+        user,
+        message: 'This email is already an authorized administrator.',
+      });
+    }
+
+    const result = createAccessRequest({
+      email: cleanEmail,
+      name: name || cleanEmail.split('@')[0],
+      source: 'portal_request',
+    });
+
+    res.json({
+      success: true,
+      status: 'pending',
+      pendingApproval: true,
+      message: 'Access request submitted to existing admins. Please await live approval.',
+      request: result.request,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const checkRequestStatus = async (req, res) => {
+  try {
+    const email = req.query.email;
+    const cleanEmail = (email || '').toLowerCase().trim();
+
+    if (!cleanEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email parameter is required.',
+      });
+    }
+
+    const result = getAccessRequestStatus(cleanEmail);
+
+    let token = null;
+    let user = null;
+
+    if (result.status === 'approved' || isEmailApproved(cleanEmail)) {
+      user = {
+        id: `user-${cleanEmail}`,
+        email: cleanEmail,
+        name: result.request?.name || cleanEmail.split('@')[0].toUpperCase(),
+        role: 'admin',
+        avatar: result.request?.avatar || '',
+      };
+      token = signToken(user);
+    }
+
+    res.json({
+      success: true,
+      status: result.status,
+      token,
+      user,
+      request: result.request || null,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };

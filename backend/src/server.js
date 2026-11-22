@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import { initRedis } from './config/redis.js';
 import { configurePassport } from './config/passport.js';
+import { initSocketServer } from './services/socketService.js';
 
 import authRoutes from './routes/authRoutes.js';
 import cmsRoutes from './routes/cmsRoutes.js';
@@ -97,9 +99,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+initSocketServer(server);
+
+server.listen(PORT, () => {
   console.log(`[CineCraft Media Server] Running on http://localhost:${PORT}`);
   console.log(`[Client Admin UI] Configured for ${process.env.CLIENT_URL || 'http://localhost:5173'}/admin`);
 });
 
+export { app, server };
 export default app;

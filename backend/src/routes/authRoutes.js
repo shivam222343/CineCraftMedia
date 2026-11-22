@@ -1,6 +1,13 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { googleCallback, getMe, devAdminLogin, logout } from '../controllers/authController.js';
+import {
+  googleCallback,
+  getMe,
+  devAdminLogin,
+  logout,
+  requestAccess,
+  checkRequestStatus,
+} from '../controllers/authController.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
@@ -34,6 +41,12 @@ router.get('/google/callback', (req, res, next) => {
 
 // Get authenticated admin info
 router.get('/me', requireAuth, getMe);
+
+// Submit new admin access request for live review
+router.post('/request-access', requestAccess);
+
+// Check access request status (polled by candidate status page)
+router.get('/request-status', checkRequestStatus);
 
 // Dev/Testing Admin Login (Bypass when Google OAuth Client ID isn't live)
 router.post('/dev-login', devAdminLogin);

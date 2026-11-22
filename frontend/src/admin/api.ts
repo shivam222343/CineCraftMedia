@@ -23,6 +23,13 @@ const rawApiBase: string = (import.meta as any).env?.VITE_API_BASE_URL || 'http:
 const cleanBase = rawApiBase.replace(/\/+$/, '');
 export const API_BASE = cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`;
 
+// Derive WebSocket endpoint from API_BASE
+export const getSocketUrl = (): string => {
+  const isSecure = API_BASE.startsWith('https://');
+  const host = API_BASE.replace(/^https?:\/\//, '').replace(/\/api$/, '').replace(/\/+$/, '');
+  return `${isSecure ? 'wss' : 'ws'}://${host}`;
+};
+
 // Local storage key for JWT token
 const TOKEN_KEY = 'cinecraft_admin_jwt';
 
@@ -83,7 +90,36 @@ let currentLeads = [...INITIAL_LEADS];
 let currentInvoices = [...INITIAL_INVOICES];
 let currentAnalytics = { ...INITIAL_ANALYTICS };
 
-// 1. Auth APIs
+// 1. Auth & Session APIs
+export const apiGetCurrentUser = async (): Promise<AdminUser | null> => {
+  const token = getStoredToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.user) {
+        return data.user as AdminUser;
+      }
+    } else if (res.status === 401 || res.status === 403) {
+      clearStoredToken();
+      return null;
+    }
+  } catch (err) {
+    console.warn('[Auth API] Could not verify session with backend:', err);
+  }
+
+  return null;
+};
+
 export const apiAdminLogin = async (
   email: string
 ): Promise<{ success: boolean; user?: AdminUser; token?: string; pendingApproval?: boolean; message?: string }> => {
@@ -91,7 +127,7 @@ export const apiAdminLogin = async (
     const res = await fetch(`${API_BASE}/auth/dev-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email: email.trim().toLowerCase() }),
     });
 
     const data = await res.json().catch(() => ({}));
@@ -109,20 +145,93 @@ export const apiAdminLogin = async (
         message: data.message || 'Access request sent to existing admins. Awaiting approval in notifications.',
       };
     }
-  } catch {
-    // Offline fallback login
-  }
 
-  const mockUser: AdminUser = {
-    id: 'admin-mock-1',
-    email: email || 'admin@cinecraftmedia.com',
-    name: (email || 'Admin').split('@')[0].toUpperCase(),
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-    role: 'superadmin',
-    lastLogin: new Date().toISOString(),
-  };
-  setStoredToken('mock-jwt-token-cinecraft');
-  return { success: true, user: mockUser, token: 'mock-jwt-token-cinecraft' };
+    return {
+      success: false,
+      message: data.message || 'Authentication failed. Please verify your credentials.',
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.message || 'Network error connecting to authentication server.',
+    };
+  }
+};
+
+export const apiSubmitAccessRequest = async (
+  email: string,
+  name?: string
+): Promise<{ success: boolean; status: string; pendingApproval?: boolean; message?: string; token?: string; user?: AdminUser }> => {
+  try {
+    const res = await fetch(`${API_BASE}/auth/request-access`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim().toLowerCase(), name }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      if (data.status === 'approved' && data.token) {
+        setStoredToken(data.token);
+      }
+      return {
+        success: true,
+        status: data.status || 'pending',
+        pendingApproval: data.status === 'pending',
+        message: data.message,
+        token: data.token,
+        user: data.user,
+      };
+    }
+
+    return {
+      success: false,
+      status: 'error',
+      message: data.message || 'Failed to submit access request.',
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      status: 'error',
+      message: err.message || 'Network connection failed.',
+    };
+  }
+};
+
+export const apiCheckRequestStatus = async (
+  email: string
+): Promise<{ success: boolean; status: 'pending' | 'approved' | 'rejected' | 'none'; token?: string; user?: AdminUser }> => {
+  try {
+    const res = await fetch(`${API_BASE}/auth/request-status?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'approved' && data.token) {
+        setStoredToken(data.token);
+      }
+      return {
+        success: true,
+        status: data.status || 'none',
+        token: data.token,
+        user: data.user,
+      };
+    }
+  } catch {
+    // Ignore network blips during polling
+  }
+  return { success: false, status: 'none' };
+};
+
+export const apiLogout = async (): Promise<void> => {
+  try {
+    await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    // Silent catch
+  } finally {
+    clearStoredToken();
+  }
 };
 
 // 1.1 Notification & Access Approval APIs

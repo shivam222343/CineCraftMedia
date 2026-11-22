@@ -12,6 +12,10 @@ import {
   apiGetContent,
   apiGetAssets,
   clearStoredToken,
+  setStoredToken,
+  apiGetCurrentUser,
+  apiLogout,
+  getSocketUrl,
   apiGetNotifications,
   apiMarkNotificationsRead,
   apiApproveAdminRequest,
@@ -84,16 +88,9 @@ const EmptyScreenView: React.FC<{
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSite }) => {
   const { theme: activeTheme, toggleTheme } = useTheme();
 
-  // Active Admin Profile (Default: Shiva M - Super Admin)
-  const [currentUser, setCurrentUser] = useState<AdminUser | null>(() => {
-    return {
-      id: 'admin-shiva',
-      email: 'shivamdombe1@gmail.com',
-      name: 'Shiva M',
-      role: 'superadmin',
-      avatar: '',
-    };
-  });
+  // Active Admin Profile (starts as null, verified via backend JWT/OAuth session)
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
 
   const [activeTab, setActiveTab] = useState<AdminTab>(() => {
     if (typeof window !== 'undefined') {
@@ -102,7 +99,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
     return 'dashboard';
   });
 
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const contentBodyRef = useRef<HTMLDivElement>(null);
 
   // Core CMS Data States
@@ -116,6 +112,84 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState<{ id: string; msg: string; type: 'success' | 'error' } | null>(null);
+
+  // 1. Initial Authentication & Session Verification
+  useEffect(() => {
+    let isMounted = true;
+
+    const verifySession = async () => {
+      setIsAuthChecking(true);
+      // Check for token returned in query params from Google OAuth callback: /admin?token=XYZ
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+      if (urlToken) {
+        setStoredToken(urlToken);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      const verifiedUser = await apiGetCurrentUser();
+      if (isMounted) {
+        if (verifiedUser) {
+          setCurrentUser(verifiedUser);
+        } else {
+          setCurrentUser(null);
+          clearStoredToken();
+        }
+        setIsAuthChecking(false);
+      }
+    };
+
+    verifySession();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // 2. Real-time WebSocket connection for active admin to receive live candidate requests
+  useEffect(() => {
+    if (!currentUser) return;
+    let isMounted = true;
+    let ws: WebSocket | null = null;
+
+    try {
+      const wsUrl = getSocketUrl();
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        ws?.send(JSON.stringify({ type: 'subscribe_admin' }));
+      };
+
+      ws.onmessage = (event) => {
+        if (!isMounted) return;
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'new_access_request' && data.request) {
+            setNotifications((prev) => {
+              const exists = prev.some((n) => n.id === data.request.id);
+              if (exists) return prev;
+              return [data.request, ...prev];
+            });
+            setHasUnread(true);
+          } else if (data.type === 'request_status_update') {
+            setNotifications((prev) =>
+              prev.map((n) =>
+                n.email === data.email ? { ...n, status: data.status } : n
+              )
+            );
+          }
+        } catch {
+          // Ignore non-json socket messages
+        }
+      };
+    } catch (err) {
+      console.warn('[Admin WS] Error initializing admin socket:', err);
+    }
+
+    return () => {
+      isMounted = false;
+      if (ws) ws.close();
+    };
+  }, [currentUser]);
 
   // Initial scroll-to-top on entering admin
   useEffect(() => {
@@ -256,11 +330,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiLogout();
+    } catch {}
     clearStoredToken();
+    sessionStorage.removeItem('ccm_pending_request_email');
     setCurrentUser(null);
-    setShowAuthModal(true);
+    window.history.replaceState({}, document.title, '/admin');
   };
+
+  if (isAuthChecking) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--adm-bg, #090a0f)',
+          color: 'var(--adm-text, #f8fafc)',
+          fontFamily: 'var(--adm-font-body, "Inter", sans-serif)',
+        }}
+      >
+        <CinecraftMediaLogo height={48} />
+        <div style={{ marginTop: '20px', fontSize: '14px', color: 'var(--adm-text-muted, #94a3b8)', letterSpacing: '0.4px' }}>
+          Verifying Admin Security Clearance...
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <AdminAuthModal
+        isOpen={true}
+        onSuccess={(user) => {
+          setCurrentUser(user);
+        }}
+        onClose={onBackToPublicSite}
+      />
+    );
+  }
 
   return (
     <div className="adm-root">
@@ -484,23 +596,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
               {hasUnread && <span className="adm-bell-badge"></span>}
             </button>
 
-            {currentUser ? (
-              <button
-                className="adm-btn adm-btn-outline-danger"
-                style={{ padding: '6px 14px', fontSize: '12px' }}
-                onClick={handleLogout}
-              >
-                Sign Out
-              </button>
-            ) : (
-              <button
-                className="adm-btn adm-btn-primary"
-                style={{ padding: '6px 14px', fontSize: '12px' }}
-                onClick={() => setShowAuthModal(true)}
-              >
-                Sign In
-              </button>
-            )}
+            <button
+              className="adm-btn adm-btn-outline-danger"
+              style={{ padding: '6px 14px', fontSize: '12px' }}
+              onClick={handleLogout}
+            >
+              Sign Out
+            </button>
           </div>
         </header>
 
@@ -753,16 +855,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
           </aside>
         </div>
       )}
-
-      {/* Auth Modal */}
-      <AdminAuthModal
-        isOpen={showAuthModal}
-        onSuccess={(user) => {
-          setCurrentUser(user);
-          setShowAuthModal(false);
-        }}
-        onClose={currentUser ? () => setShowAuthModal(false) : onBackToPublicSite}
-      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { getIsMongoConnected } from '../config/db.js';
+import { isEmailApproved } from '../services/notificationService.js';
 
 export const requireAuth = async (req, res, next) => {
   try {
@@ -39,17 +40,20 @@ export const requireAuth = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'User account not found.' });
     }
 
-    // Role-based access control (RBAC) check against ALLOWED_ADMIN_EMAILS
-    const allowedEmails = (process.env.ALLOWED_ADMIN_EMAILS || '')
-      .split(',')
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
+    // Role-based access control (RBAC) check against ALLOWED_ADMIN_EMAILS and dynamic approval set
+    const userEmail = (user.email || '').toLowerCase().trim();
+    if (!isEmailApproved(userEmail)) {
+      const allowedEmails = (process.env.ALLOWED_ADMIN_EMAILS || '')
+        .split(',')
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean);
 
-    if (allowedEmails.length > 0 && !allowedEmails.includes(user.email.toLowerCase())) {
-      return res.status(403).json({
-        success: false,
-        message: `Forbidden: Email ${user.email} is not authorized in ALLOWED_ADMIN_EMAILS.`,
-      });
+      if (allowedEmails.length > 0 && !allowedEmails.includes(userEmail)) {
+        return res.status(403).json({
+          success: false,
+          message: `Forbidden: Email ${user.email} is not authorized. An active administrator must approve access.`,
+        });
+      }
     }
 
     req.user = user;
