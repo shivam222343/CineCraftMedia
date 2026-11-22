@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { InvoiceItem, InvoiceLineItem, InvoiceStatus, LeadItem } from './types';
-import { apiCreateInvoice, apiUpdateInvoiceStatus } from './api';
+import { apiCreateInvoice, apiUpdateInvoiceStatus, API_BASE } from './api';
 
 interface InvoicingViewProps {
   invoices: InvoiceItem[];
@@ -674,7 +674,7 @@ export const InvoicingView: React.FC<InvoicingViewProps> = ({
               <button
                 className="adm-btn adm-btn-primary"
                 onClick={() => {
-                  window.open(`http://localhost:5000/api/admin/invoices/${previewInvoice._id}/pdf`, '_blank');
+                  window.open(`${API_BASE}/admin/invoices/${previewInvoice._id}/pdf`, '_blank');
                 }}
               >
                 Download PDF Deliverable

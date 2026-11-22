@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { AdminUser } from './types';
-import { apiAdminLogin } from './api';
+import { apiAdminLogin, API_BASE } from './api';
 import { CinecraftMediaLogo } from '../Components/Icons';
 
 interface AdminAuthModalProps {
@@ -49,7 +49,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
   };
 
   const handleGoogleOAuthRedirect = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   return (

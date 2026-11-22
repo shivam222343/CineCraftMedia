@@ -19,7 +19,9 @@ import {
   INITIAL_ANALYTICS,
 } from './mockData';
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const rawApiBase: string = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const cleanBase = rawApiBase.replace(/\/+$/, '');
+export const API_BASE = cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`;
 
 // Local storage key for JWT token
 const TOKEN_KEY = 'cinecraft_admin_jwt';
