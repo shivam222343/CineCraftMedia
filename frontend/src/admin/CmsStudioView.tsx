@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ThemeConfig, SectionContent, MediaAsset } from './types';
+import { INITIAL_SECTIONS } from './mockData';
+import { applyCmsThemeToDom } from '../context/ThemeContext';
 import {
   apiSaveTheme,
   apiSaveContent,
@@ -8,6 +10,59 @@ import {
   apiDeleteAsset,
   getAssetDisplayUrl,
 } from './api';
+
+const normalizeSections = (raw?: Partial<SectionContent>): SectionContent => {
+  return {
+    hero: {
+      headline: raw?.hero?.headline ?? INITIAL_SECTIONS.hero.headline,
+      eyebrow: raw?.hero?.eyebrow ?? INITIAL_SECTIONS.hero.eyebrow,
+      subheadline: raw?.hero?.subheadline ?? INITIAL_SECTIONS.hero.subheadline,
+      ctaText: raw?.hero?.ctaText ?? INITIAL_SECTIONS.hero.ctaText,
+      ctaLink: raw?.hero?.ctaLink ?? INITIAL_SECTIONS.hero.ctaLink,
+      secondaryCtaText: raw?.hero?.secondaryCtaText ?? INITIAL_SECTIONS.hero.secondaryCtaText,
+      secondaryCtaLink: raw?.hero?.secondaryCtaLink ?? INITIAL_SECTIONS.hero.secondaryCtaLink,
+    },
+    about: {
+      eyebrow: raw?.about?.eyebrow ?? INITIAL_SECTIONS.about.eyebrow,
+      title: raw?.about?.title ?? INITIAL_SECTIONS.about.title,
+      description: raw?.about?.description ?? INITIAL_SECTIONS.about.description,
+      bulletPoints: Array.isArray(raw?.about?.bulletPoints)
+        ? raw!.about!.bulletPoints
+        : INITIAL_SECTIONS.about.bulletPoints,
+    },
+    services: {
+      title: raw?.services?.title ?? INITIAL_SECTIONS.services.title,
+      subtitle: raw?.services?.subtitle ?? INITIAL_SECTIONS.services.subtitle,
+    },
+    studios: {
+      title: raw?.studios?.title ?? INITIAL_SECTIONS.studios.title,
+      subtitle: raw?.studios?.subtitle ?? INITIAL_SECTIONS.studios.subtitle,
+      ctaText: raw?.studios?.ctaText ?? INITIAL_SECTIONS.studios.ctaText,
+    },
+    footer: {
+      tagline:
+        raw?.footer?.tagline ??
+        (raw as any)?.contact?.subtitle ??
+        INITIAL_SECTIONS.footer.tagline,
+      contactEmail:
+        raw?.footer?.contactEmail ??
+        (raw as any)?.contact?.email ??
+        INITIAL_SECTIONS.footer.contactEmail,
+      contactPhone:
+        raw?.footer?.contactPhone ??
+        (raw as any)?.contact?.phone ??
+        INITIAL_SECTIONS.footer.contactPhone,
+      address:
+        raw?.footer?.address ??
+        (raw as any)?.contact?.address ??
+        INITIAL_SECTIONS.footer.address,
+      copyrightText:
+        raw?.footer?.copyrightText ??
+        (raw as any)?.contact?.copyrightText ??
+        INITIAL_SECTIONS.footer.copyrightText,
+    },
+  };
+};
 
 interface CmsStudioViewProps {
   theme: ThemeConfig;
@@ -150,10 +205,17 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
 }) => {
   const [subTab, setSubTab] = useState<'theme' | 'sections' | 'assets'>('theme');
   const [localTheme, setLocalTheme] = useState<ThemeConfig>(theme);
-  const [localSections, setLocalSections] = useState<SectionContent>(sections);
+  const [localSections, setLocalSections] = useState<SectionContent>(() => normalizeSections(sections));
   const [activeSectionKey, setActiveSectionKey] = useState<keyof SectionContent>('hero');
   const [isSaving, setIsSaving] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
+
+  // Sync sections when prop updates from backend
+  useEffect(() => {
+    if (sections) {
+      setLocalSections(normalizeSections(sections));
+    }
+  }, [sections]);
 
   // Asset Management State
   const [assetSourceType, setAssetSourceType] = useState<'upload' | 'url'>('upload');
@@ -169,51 +231,16 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
   const [copiedAssetId, setCopiedAssetId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // 1. Live Real-Time Application of Theme & Google Fonts
+  // 1. Live Real-Time Application of Theme across BOTH Admin and Public DOM
   useEffect(() => {
-    // Dynamically inject Google Fonts for real-time preview
-    const cleanFontName = (fontStr: string) => fontStr.split(',')[0].replace(/['"]/g, '').trim();
-    const primaryFont = cleanFontName(localTheme.fontFamilyPrimary);
-    const secondaryFont = cleanFontName(localTheme.fontFamilySecondary);
+    // Apply dynamic theme styles, CSS variables, and Google Fonts
+    applyCmsThemeToDom(localTheme);
 
-    const linkId = 'dynamic-cms-google-fonts';
-    let linkEl = document.getElementById(linkId) as HTMLLinkElement | null;
-    if (!linkEl) {
-      linkEl = document.createElement('link');
-      linkEl.id = linkId;
-      linkEl.rel = 'stylesheet';
-      document.head.appendChild(linkEl);
-    }
-    linkEl.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-      primaryFont
-    )}:wght@400;600;700;800;900&family=${encodeURIComponent(
-      secondaryFont
-    )}:wght@400;500;600;700&display=swap`;
+    // Persist to local storage for immediate public site rendering without flash
+    localStorage.setItem('ccm_cms_theme', JSON.stringify(localTheme));
 
-    // Calculate border radius
-    const radiusMap: Record<ThemeConfig['borderStyle'], string> = {
-      sharp: '0px',
-      'rounded-sm': '4px',
-      'rounded-md': '8px',
-      'rounded-lg': '14px',
-      'rounded-full': '9999px',
-    };
-    const radiusVal = radiusMap[localTheme.borderStyle] || '8px';
-
-    // Inject CSS variables into document root in real time
-    const root = document.documentElement;
-    root.style.setProperty('--font-heading', `"${primaryFont}", sans-serif`);
-    root.style.setProperty('--font-body', `"${secondaryFont}", sans-serif`);
-    root.style.setProperty('--swatch--brand', localTheme.colorPrimary);
-    root.style.setProperty('--adm-primary', localTheme.colorPrimary);
-    root.style.setProperty('--adm-primary-hover', localTheme.colorPrimary);
-    root.style.setProperty('--adm-surface', localTheme.colorSurface);
-    root.style.setProperty('--adm-bg', localTheme.colorBackground);
-    root.style.setProperty('--adm-text', localTheme.colorText);
-    root.style.setProperty('--color-accent-blue', localTheme.colorAccentBlue);
-    root.style.setProperty('--swatch--accent-blue', localTheme.colorAccentBlue);
-    root.style.setProperty('--swatch--burgundy', localTheme.colorSecondary);
-    root.style.setProperty('--adm-radius', radiusVal);
+    // Broadcast event across all components & public site listeners
+    window.dispatchEvent(new CustomEvent('ccm_theme_changed', { detail: localTheme }));
 
     // Notify parent for instant responsive dashboard sync
     onThemeUpdated(localTheme);
@@ -1274,11 +1301,11 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                     <input
                       type="text"
                       className="adm-input"
-                      value={localSections.footer.tagline}
+                      value={localSections.footer?.tagline || ''}
                       onChange={(e) =>
                         setLocalSections({
                           ...localSections,
-                          footer: { ...localSections.footer, tagline: e.target.value },
+                          footer: { ...(localSections.footer || INITIAL_SECTIONS.footer), tagline: e.target.value },
                         })
                       }
                     />
@@ -1289,11 +1316,11 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                       <input
                         type="email"
                         className="adm-input"
-                        value={localSections.footer.contactEmail}
+                        value={localSections.footer?.contactEmail || ''}
                         onChange={(e) =>
                           setLocalSections({
                             ...localSections,
-                            footer: { ...localSections.footer, contactEmail: e.target.value },
+                            footer: { ...(localSections.footer || INITIAL_SECTIONS.footer), contactEmail: e.target.value },
                           })
                         }
                       />
@@ -1303,11 +1330,11 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                       <input
                         type="text"
                         className="adm-input"
-                        value={localSections.footer.contactPhone}
+                        value={localSections.footer?.contactPhone || ''}
                         onChange={(e) =>
                           setLocalSections({
                             ...localSections,
-                            footer: { ...localSections.footer, contactPhone: e.target.value },
+                            footer: { ...(localSections.footer || INITIAL_SECTIONS.footer), contactPhone: e.target.value },
                           })
                         }
                       />
@@ -1318,11 +1345,11 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                     <input
                       type="text"
                       className="adm-input"
-                      value={localSections.footer.address}
+                      value={localSections.footer?.address || ''}
                       onChange={(e) =>
                         setLocalSections({
                           ...localSections,
-                          footer: { ...localSections.footer, address: e.target.value },
+                          footer: { ...(localSections.footer || INITIAL_SECTIONS.footer), address: e.target.value },
                         })
                       }
                     />
@@ -1332,11 +1359,11 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                     <input
                       type="text"
                       className="adm-input"
-                      value={localSections.footer.copyrightText}
+                      value={localSections.footer?.copyrightText || ''}
                       onChange={(e) =>
                         setLocalSections({
                           ...localSections,
-                          footer: { ...localSections.footer, copyrightText: e.target.value },
+                          footer: { ...(localSections.footer || INITIAL_SECTIONS.footer), copyrightText: e.target.value },
                         })
                       }
                     />
@@ -1597,16 +1624,17 @@ export const CmsStudioView: React.FC<CmsStudioViewProps> = ({
                       CINECRAFT MEDIA
                     </div>
                     <div style={{ fontSize: '12.5px', opacity: 0.8 }}>
-                      {localSections.footer.tagline || 'Pioneering Cinematic Excellence Worldwide.'}
+                      {localSections.footer?.tagline || INITIAL_SECTIONS.footer.tagline}
                     </div>
                     <div style={{ fontSize: '11.5px', opacity: 0.7 }}>
-                      📧 {localSections.footer.contactEmail} • 📞 {localSections.footer.contactPhone}
+                      📧 {localSections.footer?.contactEmail || INITIAL_SECTIONS.footer.contactEmail} • 📞{' '}
+                      {localSections.footer?.contactPhone || INITIAL_SECTIONS.footer.contactPhone}
                     </div>
                     <div style={{ fontSize: '11.5px', opacity: 0.6 }}>
-                      📍 {localSections.footer.address}
+                      📍 {localSections.footer?.address || INITIAL_SECTIONS.footer.address}
                     </div>
                     <div style={{ fontSize: '11px', opacity: 0.4, marginTop: '8px' }}>
-                      {localSections.footer.copyrightText}
+                      {localSections.footer?.copyrightText || INITIAL_SECTIONS.footer.copyrightText}
                     </div>
                   </div>
                 )}

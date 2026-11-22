@@ -49,6 +49,13 @@ const DEFAULT_SECTIONS_FALLBACK = {
       'High-concept creative development, branded storytelling, and TV commercials powered by world-class directors and cutting-edge visual effects.',
     ctaText: 'Inquire for Studio Production',
   },
+  footer: {
+    tagline: 'Pioneering Cinematic Excellence Worldwide.',
+    contactEmail: 'contact@cinecraftmedia.com',
+    contactPhone: '+91 93704 66245',
+    address: 'CineCraft Media Complex, India',
+    copyrightText: '© 2026 CineCraft Media. All rights reserved.',
+  },
   contact: {
     title: 'START YOUR PRODUCTION JOURNEY',
     subtitle: 'Connect with our production managers and equipment rental specialists.',
@@ -103,16 +110,33 @@ export const getPublicTheme = async (req, res) => {
   }
 };
 
+const normalizeSectionsPayload = (sec) => {
+  const sections = sec && typeof sec.toObject === 'function' ? sec.toObject() : { ...sec };
+  if (!sections.footer) {
+    sections.footer = {
+      tagline: 'Pioneering Cinematic Excellence Worldwide.',
+      contactEmail: sections.contact?.email || 'contact@cinecraftmedia.com',
+      contactPhone: sections.contact?.phone || '+91 93704 66245',
+      address: sections.contact?.address || 'CineCraft Media Complex, India',
+      copyrightText: sections.contact?.copyrightText || '© 2026 CineCraft Media. All rights reserved.',
+    };
+  }
+  return sections;
+};
+
 // GET /api/v1/content (Public, Cached in Redis)
 export const getPublicContent = async (req, res) => {
   try {
     const cachedContent = await getCached(CacheKeys.CONTENT);
     if (cachedContent) {
+      if (cachedContent.sections) {
+        cachedContent.sections = normalizeSectionsPayload(cachedContent.sections);
+      }
       return res.json({ success: true, source: 'cache', data: cachedContent });
     }
 
     let payload = {
-      sections: memorySettings.sections,
+      sections: normalizeSectionsPayload(memorySettings.sections),
       assets: memorySettings.assets,
       updatedAt: memorySettings.updatedAt,
     };
@@ -122,7 +146,7 @@ export const getPublicContent = async (req, res) => {
         const settings = await SiteSettings.findOne().sort({ createdAt: -1 });
         if (settings) {
           payload = {
-            sections: settings.sections || memorySettings.sections,
+            sections: normalizeSectionsPayload(settings.sections || memorySettings.sections),
             assets: settings.assets || memorySettings.assets,
             updatedAt: settings.updatedAt || memorySettings.updatedAt,
           };
@@ -161,7 +185,11 @@ export const getAdminSettings = async (req, res) => {
             ...(userId ? { updatedBy: userId } : {}),
           });
         }
-        return res.json({ success: true, settings });
+        if (settings) {
+          const plainSettings = typeof settings.toObject === 'function' ? settings.toObject() : { ...settings };
+          plainSettings.sections = normalizeSectionsPayload(plainSettings.sections);
+          return res.json({ success: true, settings: plainSettings });
+        }
       } catch (dbErr) {
         console.warn('[CMS DB Warning] getAdminSettings fallback to memory:', dbErr.message);
       }
@@ -172,7 +200,7 @@ export const getAdminSettings = async (req, res) => {
       settings: {
         _id: 'memory-cms-settings',
         theme: memorySettings.theme,
-        sections: memorySettings.sections,
+        sections: normalizeSectionsPayload(memorySettings.sections),
         assets: memorySettings.assets,
         updatedAt: memorySettings.updatedAt,
       },

@@ -12,10 +12,10 @@ import { PageTransition } from './Components/PageTransition';
 import { WhatsAppButton } from './Components/WhatsAppButton';
 import { EquipmentsPage } from './Components/EquipmentsPage';
 import { AdminDashboard } from './admin/AdminDashboard';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ThemeToggle } from './Components/ThemeToggle';
 
-// Color themes for each nav destination's organic stroke transition
+// Default Color themes for each nav destination's organic stroke transition
 const SECTION_TRANSITION_COLORS: Record<string, string> = {
   'services-stack': '#670b22', // Deep Wine / Burgundy Red
   'featured-projects': '#ff5121', // LxL Signature Electric Orange
@@ -28,7 +28,8 @@ const SECTION_TRANSITION_COLORS: Record<string, string> = {
   'admin': '#ff5121',
 };
 
-function App() {
+function AppContent() {
+  const { cmsTheme } = useTheme();
   const [currentRoute, setCurrentRoute] = useState<'home' | 'equipments' | 'admin'>(() => {
     if (typeof window !== 'undefined') {
       if (window.location.pathname.startsWith('/admin')) return 'admin';
@@ -44,7 +45,7 @@ function App() {
   }>({
     active: false,
     phase: 'idle',
-    color: '#670b22',
+    color: cmsTheme?.colorPrimary || '#ff5121',
   });
 
   // Listen to browser forward/back buttons & dev keyboard shortcut (Alt + A) for Admin
@@ -82,7 +83,12 @@ function App() {
   }, [currentRoute]);
 
   const handleNavigate = (sectionId: string) => {
-    const transitionColor = SECTION_TRANSITION_COLORS[sectionId] || '#0d9488';
+    let transitionColor = SECTION_TRANSITION_COLORS[sectionId] || cmsTheme?.colorPrimary || '#ff5121';
+    if (sectionId === 'hero' || sectionId === 'home' || sectionId === 'featured-projects' || sectionId === 'admin') {
+      transitionColor = cmsTheme?.colorPrimary || '#ff5121';
+    } else if (sectionId === 'studios') {
+      transitionColor = cmsTheme?.colorAccentBlue || '#055dff';
+    }
 
     // Phase 1: Slow, cinematic drawing of the organic fluid stroke on screen (0.92s)
     setTransitionState({
@@ -100,10 +106,9 @@ function App() {
         if (window.location.pathname !== '/equipments') {
           window.history.pushState({}, '', '/equipments');
         }
-        window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
-        const wasEquipments = currentRoute === 'equipments';
-        if (wasEquipments) {
+        // If navigating away from equipments back to home
+        if (currentRoute === 'equipments') {
           setCurrentRoute('home');
           if (window.location.pathname !== '/') {
             window.history.pushState({}, '', '/');
@@ -114,24 +119,20 @@ function App() {
           window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
           // If we were on equipments, wait 60ms for home DOM to mount before scrolling
+          const delay = currentRoute === 'equipments' ? 60 : 0;
           setTimeout(() => {
-            const el = document.getElementById(sectionId);
-            if (el) {
-              el.scrollIntoView({ behavior: 'instant' });
-            } else {
-              window.scrollTo({ top: 0, behavior: 'instant' });
+            const targetEl = document.getElementById(sectionId);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'instant', block: 'start' });
             }
-          }, wasEquipments ? 60 : 0);
+          }, delay);
         }
       }
 
-      // Phase 2: Drawing off screen to reveal the new section (0.75s)
-      setTransitionState((prev) => ({
-        ...prev,
-        phase: 'exit',
-      }));
+      // Phase 2: Fade & wipe away the curtain revealing destination
+      setTransitionState((prev) => ({ ...prev, phase: 'exit' }));
 
-      // Phase 3: Transition complete
+      // Phase 3: Teardown transition overlay (0.75s)
       setTimeout(() => {
         setTransitionState({
           active: false,
@@ -143,70 +144,76 @@ function App() {
   };
 
   return (
-    <ThemeProvider>
-      <div className="lxl-app-root">
-        {/* Full-Screen Organic SVG Page Transition with slow hand-drawn brush stroke */}
-        <PageTransition
-          active={transitionState.active}
-          phase={transitionState.phase}
-          color={transitionState.color}
+    <div className="lxl-app-root">
+      {/* Full-Screen Organic SVG Page Transition with slow hand-drawn brush stroke */}
+      <PageTransition
+        active={transitionState.active}
+        phase={transitionState.phase}
+        color={transitionState.color}
+      />
+
+      {currentRoute === 'admin' ? (
+        <AdminDashboard
+          onBackToPublicSite={() => {
+            if (window.location.pathname !== '/') {
+              window.history.pushState({}, '', '/');
+            }
+            setCurrentRoute('home');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
         />
+      ) : currentRoute === 'equipments' ? (
+        <>
+          {/* Standalone Equipments Page (/equipments) */}
+          <EquipmentsPage onBackToHome={() => handleNavigate('home')} />
 
-        {currentRoute === 'admin' ? (
-          <AdminDashboard
-            onBackToPublicSite={() => {
-              if (window.location.pathname !== '/') {
-                window.history.pushState({}, '', '/');
-              }
-              setCurrentRoute('home');
-              window.scrollTo({ top: 0, behavior: 'instant' });
-            }}
-          />
-        ) : currentRoute === 'equipments' ? (
-          <>
-            {/* Standalone Equipments Page (/equipments) */}
-            <EquipmentsPage onBackToHome={() => handleNavigate('home')} />
+          {/* Floating Interactive WhatsApp Inquiry Button */}
+          <WhatsAppButton />
 
-            {/* Floating Interactive WhatsApp Inquiry Button */}
-            <WhatsAppButton />
+          {/* Global Theme Toggle */}
+          <ThemeToggle />
+        </>
+      ) : (
+        <>
+          {/* Main Navigation with Mega Dropdowns & Custom Underlines */}
+          <Navbar onNavigateSection={handleNavigate} />
 
-            {/* Global Theme Toggle */}
-            <ThemeToggle />
-          </>
-        ) : (
-          <>
-            {/* Main Navigation with Mega Dropdowns & Custom Underlines */}
-            <Navbar onNavigateSection={handleNavigate} />
+          {/* Hero Section */}
+          <HeroSection />
 
-            {/* Hero Section */}
-            <HeroSection />
+          {/* Video Zoom & Display Statement Section */}
+          <VideoScrollSection />
 
-            {/* Video Zoom & Display Statement Section */}
-            <VideoScrollSection />
+          {/* Services Card Stacking Deck */}
+          <CardStackSection onNavigateEquipments={() => handleNavigate('equipments')} />
 
-            {/* Services Card Stacking Deck */}
-            <CardStackSection onNavigateEquipments={() => handleNavigate('equipments')} />
+          {/* Featured Entertainment Projects Showcase */}
+          <FeaturedProjects />
 
-            {/* Featured Entertainment Projects Showcase */}
-            <FeaturedProjects />
+          {/* About & Ethos Section */}
+          <WhyLxL />
 
-            {/* About & Ethos Section */}
-            <WhyLxL />
+          {/* Cinecraft Studios Commercial Extension */}
+          <StudiosBanner />
 
-            {/* Cinecraft Studios Commercial Extension */}
-            <StudiosBanner />
+          {/* Agency Footer */}
+          <Footer />
 
-            {/* Agency Footer */}
-            <Footer />
+          {/* Floating Interactive WhatsApp Inquiry Button */}
+          <WhatsAppButton />
 
-            {/* Floating Interactive WhatsApp Inquiry Button */}
-            <WhatsAppButton />
+          {/* Global Theme Toggle */}
+          <ThemeToggle />
+        </>
+      )}
+    </div>
+  );
+}
 
-            {/* Global Theme Toggle */}
-            <ThemeToggle />
-          </>
-        )}
-      </div>
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
     </ThemeProvider>
   );
 }
