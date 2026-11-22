@@ -205,6 +205,18 @@
   color: var(--adm-text);
 }
 
+[data-theme="dark"] .adm-nav-item:hover,
+:root:not([data-theme="light"]) .adm-nav-item:hover {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .adm-nav-item:hover .adm-nav-icon,
+[data-theme="dark"] .adm-nav-item:hover .adm-nav-text,
+:root:not([data-theme="light"]) .adm-nav-item:hover .adm-nav-icon,
+:root:not([data-theme="light"]) .adm-nav-item:hover .adm-nav-text {
+  color: #ffffff !important;
+}
+
 .adm-nav-item.active {
   color: #ffffff !important;
   background: var(--adm-primary) !important;

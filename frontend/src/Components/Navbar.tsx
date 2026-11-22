@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CinecraftMediaLogo } from './Icons';
+import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   onNavigateSection?: (sectionId: string) => void;
@@ -82,6 +83,9 @@ const AnimatedUnderline: React.FC<AnimatedUnderlineProps> = ({
 };
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [scrolled, setScrolled] = useState(false);
   const [activeHover, setActiveHover] = useState<NavKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -171,7 +175,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
 
   const getLinkColor = (key: NavKey) => {
     if (isStudiosTheme) {
-      return activeHover === key ? '#0d1522' : '#5b6978';
+      if (isDark) {
+        return activeHover === key ? '#ffffff' : 'rgba(255, 255, 255, 0.7)';
+      }
+      return activeHover === key ? '#055dff' : '#5b6978';
     }
     if (activeHover) {
       return activeHover === key ? '#ff5121' : 'var(--swatch--light-o60)';
@@ -743,6 +750,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                           fontWeight: 700,
                           letterSpacing: '0.3px',
                           textTransform: 'lowercase',
+                          color: isDark ? '#ffffff' : '#0d1522',
                         }}
                       >
                         craft
@@ -757,6 +765,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                       fontSize: '13px',
                       lineHeight: '1.55',
                       marginBottom: '16px',
+                      color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#28323e',
                     }}
                   >
                     There’s another side to what we do. Through Cinecraft Studios, we bring the same creative craft and production expertise to brands, music and commercial campaigns.
