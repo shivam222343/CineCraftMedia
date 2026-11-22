@@ -141,31 +141,33 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
   }, [email, onApproved]);
 
   return (
-    <div className="adm-modal-backdrop" style={{ zIndex: 1200, padding: '20px' }}>
+    <div className="adm-modal-backdrop" style={{ zIndex: 1200, padding: '20px', overflow: 'hidden' }}>
       <div
-        className="adm-modal-panel"
+        className="adm-modal-panel adm-auth-modal-panel"
         style={{
-          maxWidth: '480px',
+          maxWidth: '440px',
           width: '100%',
+          maxHeight: 'none',
+          overflow: 'hidden',
           textAlign: 'center',
           border: '1px solid var(--adm-border)',
           borderRadius: '16px',
           background: 'var(--adm-surface)',
-          padding: '36px 30px',
+          padding: '24px 26px',
           boxShadow: '0 25px 60px rgba(0, 0, 0, 0.45)',
           animation: 'admFadeIn 0.3s ease forwards',
         }}
       >
         {/* Top CineCraft Brand Branding */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-          <CinecraftMediaLogo height={42} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+          <CinecraftMediaLogo height={34} />
         </div>
 
-        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '2px', marginBottom: '6px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '2px', marginBottom: '4px' }}>
           <span
             style={{
               fontFamily: 'var(--font-script, "Scribo", cursive, sans-serif)',
-              fontSize: '24px',
+              fontSize: '22px',
               color: '#ff5121',
               fontWeight: 400,
             }}
@@ -175,7 +177,7 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
           <span
             style={{
               fontFamily: 'var(--font-heading, "Owners Wide", sans-serif)',
-              fontSize: '18px',
+              fontSize: '16px',
               fontWeight: 700,
               color: 'var(--swatch--light, #fcf2bd)',
               textTransform: 'lowercase',
@@ -187,12 +189,12 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
 
         <div
           style={{
-            fontSize: '11px',
+            fontSize: '10.5px',
             textTransform: 'uppercase',
-            letterSpacing: '1.2px',
+            letterSpacing: '1px',
             color: 'var(--adm-primary)',
             fontWeight: 700,
-            marginBottom: '22px',
+            marginBottom: '14px',
           }}
         >
           Admin Portal Access Gate
@@ -203,21 +205,21 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '5px 14px',
+            gap: '6px',
+            padding: '4px 12px',
             borderRadius: '20px',
             background: socketConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
             border: `1px solid ${socketConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
-            marginBottom: '24px',
-            fontSize: '12px',
+            marginBottom: '16px',
+            fontSize: '11px',
             fontWeight: 600,
             color: socketConnected ? '#10b981' : '#f59e0b',
           }}
         >
           <span
             style={{
-              width: '8px',
-              height: '8px',
+              width: '7px',
+              height: '7px',
               borderRadius: '50%',
               backgroundColor: socketConnected ? '#10b981' : '#f59e0b',
               display: 'inline-block',
@@ -231,20 +233,20 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
         {status === 'pending' && (
           <div
             style={{
-              padding: '24px 20px',
+              padding: '16px 14px',
               borderRadius: '12px',
               background: 'var(--adm-surface-light)',
               border: '1px solid rgba(245, 158, 11, 0.3)',
-              marginBottom: '24px',
+              marginBottom: '16px',
               textAlign: 'center',
             }}
           >
             {/* Pulsing Radar Ring */}
             <div
               style={{
-                width: '64px',
-                height: '64px',
-                margin: '0 auto 16px',
+                width: '48px',
+                height: '48px',
+                margin: '0 auto 10px',
                 borderRadius: '50%',
                 background: 'rgba(255, 81, 33, 0.12)',
                 border: '2px solid var(--adm-primary)',
@@ -254,14 +256,14 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
                 position: 'relative',
               }}
             >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5121" strokeWidth="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff5121" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
               <span
                 style={{
                   position: 'absolute',
-                  inset: '-6px',
+                  inset: '-4px',
                   borderRadius: '50%',
                   border: '1px solid rgba(255, 81, 33, 0.4)',
                   animation: 'admPing 2s cubic-bezier(0, 0, 0.2, 1) infinite',
@@ -269,10 +271,10 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
               />
             </div>
 
-            <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: 700, color: 'var(--adm-text)' }}>
+            <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: 700, color: 'var(--adm-text)' }}>
               Awaiting Administrator Approval
             </h3>
-            <p style={{ margin: '0 0 14px', fontSize: '13px', color: 'var(--adm-text-muted)', lineHeight: '1.5' }}>
+            <p style={{ margin: '0 0 10px', fontSize: '12px', color: 'var(--adm-text-muted)', lineHeight: '1.4' }}>
               Your access request has been delivered to active administrators. As soon as an admin approves your request from their notifications panel, this page will unlock in real time.
             </p>
 
@@ -280,10 +282,10 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
               style={{
                 display: 'inline-block',
                 background: 'var(--adm-surface)',
-                padding: '6px 14px',
-                borderRadius: '8px',
+                padding: '4px 12px',
+                borderRadius: '6px',
                 border: '1px solid var(--adm-border)',
-                fontSize: '12.5px',
+                fontSize: '11.5px',
                 color: 'var(--adm-text)',
                 fontFamily: 'monospace',
                 wordBreak: 'break-all',
@@ -292,7 +294,7 @@ export const AdminRequestStatusView: React.FC<AdminRequestStatusViewProps> = ({
               {email}
             </div>
 
-            <div style={{ marginTop: '14px', fontSize: '11px', color: 'var(--adm-text-subtle)' }}>
+            <div style={{ marginTop: '10px', fontSize: '10px', color: 'var(--adm-text-subtle)' }}>
               Last synchronized: {lastPingTime}
             </div>
           </div>

@@ -941,28 +941,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
 
       {/* Set Password Modal for First-time Google OAuth Admins */}
       {showSetPasswordModal && (
-        <div className="adm-modal-backdrop" style={{ zIndex: 1300, padding: '20px' }}>
+        <div className="adm-modal-backdrop" style={{ zIndex: 1300, padding: '20px', overflow: 'hidden' }}>
           <div
-            className="adm-modal-panel"
+            className="adm-modal-panel adm-auth-modal-panel"
             style={{
-              maxWidth: '440px',
+              maxWidth: '420px',
               width: '100%',
+              maxHeight: 'none',
+              overflow: 'hidden',
               borderRadius: '16px',
               background: 'var(--adm-surface)',
               border: '1px solid var(--adm-border)',
-              padding: '32px 28px',
+              padding: '24px 26px',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5)',
               textAlign: 'center',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
-              <CinecraftMediaLogo height={38} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+              <CinecraftMediaLogo height={34} />
             </div>
 
-            <h3 style={{ margin: '0 0 6px', fontSize: '18px', fontWeight: 700, color: 'var(--adm-text)' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: 700, color: 'var(--adm-text)' }}>
               Set Your Admin Password
             </h3>
-            <p style={{ margin: '0 0 20px', fontSize: '13px', color: 'var(--adm-text-muted)', lineHeight: '1.45' }}>
+            <p style={{ margin: '0 0 16px', fontSize: '12.5px', color: 'var(--adm-text-muted)', lineHeight: '1.4' }}>
               Welcome! Since you logged in with Google, please configure an admin password to enable direct email & password login.
             </p>
 

@@ -830,6 +830,12 @@ body[data-theme="light"] .adm-view-title p,
   position: relative;
 }
 
+.adm-auth-modal-panel {
+  max-height: none !important;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+}
+
 .adm-modal-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--adm-border);

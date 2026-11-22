@@ -140,30 +140,32 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
   };
 
   return (
-    <div className="adm-modal-backdrop" style={{ zIndex: 1100 }}>
+    <div className="adm-modal-backdrop" style={{ zIndex: 1100, overflow: 'hidden' }}>
       <div
-        className="adm-modal-panel"
+        className="adm-modal-panel adm-auth-modal-panel"
         style={{
-          maxWidth: '460px',
+          maxWidth: '430px',
           width: '100%',
+          maxHeight: 'none',
+          overflow: 'hidden',
           textAlign: 'center',
           borderRadius: '16px',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5)',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
           background: 'var(--adm-surface)',
           border: '1px solid var(--adm-border)',
         }}
       >
-        <div style={{ padding: '36px 30px' }}>
+        <div style={{ padding: '22px 26px' }}>
           {/* Brand Logo & Public-Matched Typography */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-            <CinecraftMediaLogo height={42} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+            <CinecraftMediaLogo height={34} />
           </div>
 
-          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '2px', marginBottom: '6px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '2px', marginBottom: '4px' }}>
             <span
               style={{
                 fontFamily: 'var(--font-script, "Scribo", cursive, sans-serif)',
-                fontSize: '24px',
+                fontSize: '22px',
                 color: '#ff5121',
                 fontWeight: 400,
               }}
@@ -173,7 +175,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
             <span
               style={{
                 fontFamily: 'var(--font-heading, "Owners Wide", sans-serif)',
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: 700,
                 color: 'var(--swatch--light, #fcf2bd)',
                 textTransform: 'lowercase',
@@ -185,34 +187,34 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
 
           <h2
             style={{
-              margin: '0 0 6px',
-              fontSize: '15px',
+              margin: '0 0 2px',
+              fontSize: '14px',
               fontWeight: 700,
-              letterSpacing: '0.5px',
+              letterSpacing: '0.4px',
               color: 'var(--adm-text)',
             }}
           >
-            {authMode === 'signin' ? 'Admin Portal Authorization' : 'Request Admin Portal Access'}
+            {authMode === 'signin' ? 'Admin Portal Authorization' : 'Request Portal Access'}
           </h2>
 
-          <p style={{ margin: '0 0 22px', fontSize: '13px', color: 'var(--adm-text-muted)', lineHeight: '1.4' }}>
+          <p style={{ margin: '0 0 14px', fontSize: '12px', color: 'var(--adm-text-muted)', lineHeight: '1.35' }}>
             {authMode === 'signin'
               ? 'Authorized Personnel Only • Google OAuth & Password Protected'
-              : 'Submit your credentials to existing administrators for live approval.'}
+              : 'Submit your credentials to active admins for live approval.'}
           </p>
 
           {errorMessage && (
             <div
               style={{
-                padding: '12px 14px',
+                padding: '8px 12px',
                 borderRadius: '8px',
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.35)',
                 color: '#f87171',
-                fontSize: '13px',
-                marginBottom: '20px',
+                fontSize: '12px',
+                marginBottom: '12px',
                 textAlign: 'left',
-                lineHeight: '1.4',
+                lineHeight: '1.35',
               }}
             >
               ✕ {errorMessage}
@@ -227,18 +229,19 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                 className="adm-btn adm-btn-secondary"
                 style={{
                   width: '100%',
-                  padding: '12px 18px',
+                  padding: '9px 14px',
                   justifyContent: 'center',
                   background: '#ffffff',
                   color: '#1f2937',
                   borderColor: '#e5e7eb',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  marginBottom: '18px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                  marginBottom: '10px',
                   fontWeight: 600,
+                  fontSize: '13px',
                 }}
                 onClick={handleGoogleOAuthRedirect}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" style={{ marginRight: '8px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: '8px', flexShrink: 0 }}>
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -263,36 +266,37 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  margin: '18px 0',
+                  gap: '8px',
+                  margin: '10px 0',
                   color: 'var(--adm-text-subtle)',
-                  fontSize: '11px',
+                  fontSize: '10px',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px',
+                  letterSpacing: '0.8px',
                 }}
               >
                 <div style={{ flex: 1, height: '1px', background: 'var(--adm-border)' }} />
-                <span>OR EMAIL & PASSWORD LOGIN</span>
+                <span>OR EMAIL & PASSWORD</span>
                 <div style={{ flex: 1, height: '1px', background: 'var(--adm-border)' }} />
               </div>
 
               {/* Email + Password Login Form */}
               <form onSubmit={handleSignIn}>
-                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '14px' }}>
-                  <label className="adm-form-label">Authorized Admin Email</label>
+                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '9px' }}>
+                  <label className="adm-form-label" style={{ fontSize: '11.5px', marginBottom: '4px' }}>Authorized Admin Email</label>
                   <input
                     type="email"
                     className="adm-input"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="admin@cinecraftmedia.com"
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
                     required
                   />
                 </div>
 
-                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '18px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label className="adm-form-label" style={{ margin: 0 }}>Admin Password</label>
+                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label className="adm-form-label" style={{ margin: 0, fontSize: '11.5px' }}>Admin Password</label>
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -300,7 +304,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                         background: 'none',
                         border: 'none',
                         color: 'var(--adm-primary)',
-                        fontSize: '11px',
+                        fontSize: '10.5px',
                         cursor: 'pointer',
                         padding: 0,
                       }}
@@ -314,17 +318,18 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
                     placeholder="Enter admin password"
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
                     required
                   />
-                  <div style={{ fontSize: '11px', color: 'var(--adm-text-subtle)', marginTop: '6px' }}>
-                    Default initial password: <code>Admin@12345</code> (or your custom password)
+                  <div style={{ fontSize: '10px', color: 'var(--adm-text-subtle)', marginTop: '3px' }}>
+                    Default initial password: <code>Admin@12345</code>
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   className="adm-btn adm-btn-primary"
-                  style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '13.5px' }}
+                  style={{ width: '100%', justifyContent: 'center', padding: '9.5px', fontSize: '13px' }}
                   disabled={isLoading}
                 >
                   {isLoading ? 'Verifying RBAC...' : 'Sign In to Admin Portal'}
@@ -332,8 +337,8 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
               </form>
 
               {/* Option to request access */}
-              <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--adm-border)' }}>
-                <span style={{ fontSize: '13px', color: 'var(--adm-text-muted)' }}>
+              <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--adm-border)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--adm-text-muted)' }}>
                   New administrator candidate?{' '}
                 </span>
                 <button
@@ -346,7 +351,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                     background: 'none',
                     border: 'none',
                     color: 'var(--adm-primary)',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     textDecoration: 'underline',
@@ -365,18 +370,19 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                 className="adm-btn adm-btn-secondary"
                 style={{
                   width: '100%',
-                  padding: '12px 18px',
+                  padding: '9px 14px',
                   justifyContent: 'center',
                   background: '#ffffff',
                   color: '#1f2937',
                   borderColor: '#e5e7eb',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  marginBottom: '18px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                  marginBottom: '10px',
                   fontWeight: 600,
+                  fontSize: '13px',
                 }}
                 onClick={handleGoogleOAuthRedirect}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" style={{ marginRight: '8px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" style={{ marginRight: '8px', flexShrink: 0 }}>
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -401,43 +407,45 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  margin: '18px 0',
+                  gap: '8px',
+                  margin: '10px 0',
                   color: 'var(--adm-text-subtle)',
-                  fontSize: '11px',
+                  fontSize: '10px',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px',
+                  letterSpacing: '0.8px',
                 }}
               >
                 <div style={{ flex: 1, height: '1px', background: 'var(--adm-border)' }} />
-                <span>OR SUBMIT DETAILS FOR LIVE APPROVAL</span>
+                <span>OR SUBMIT DETAILS FOR APPROVAL</span>
                 <div style={{ flex: 1, height: '1px', background: 'var(--adm-border)' }} />
               </div>
 
               <form onSubmit={handleRequestAccess}>
-                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '14px' }}>
-                  <label className="adm-form-label">Your Full Name</label>
+                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '9px' }}>
+                  <label className="adm-form-label" style={{ fontSize: '11.5px', marginBottom: '4px' }}>Your Full Name</label>
                   <input
                     type="text"
                     className="adm-input"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
                     placeholder="e.g. John Doe"
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
                     required
                   />
                 </div>
 
-                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '18px' }}>
-                  <label className="adm-form-label">Work / Google Email</label>
+                <div className="adm-form-group" style={{ textAlign: 'left', marginBottom: '12px' }}>
+                  <label className="adm-form-label" style={{ fontSize: '11.5px', marginBottom: '4px' }}>Work / Google Email</label>
                   <input
                     type="email"
                     className="adm-input"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="candidate@company.com"
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
                     required
                   />
-                  <div style={{ fontSize: '11px', color: 'var(--adm-text-subtle)', marginTop: '6px' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--adm-text-subtle)', marginTop: '3px' }}>
                     Existing admins will receive a live notification to accept or reject your request in real time.
                   </div>
                 </div>
@@ -445,13 +453,13 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                 <button
                   type="submit"
                   className="adm-btn adm-btn-primary"
-                  style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '13.5px' }}
+                  style={{ width: '100%', justifyContent: 'center', padding: '9.5px', fontSize: '13px' }}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Sending Request...' : 'Send Access Request to Existing Admins'}
+                  {isLoading ? 'Sending Request...' : 'Send Access Request to Admins'}
                 </button>
 
-                <div style={{ marginTop: '18px' }}>
+                <div style={{ marginTop: '12px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -462,7 +470,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                       background: 'none',
                       border: 'none',
                       color: 'var(--adm-text-muted)',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       cursor: 'pointer',
                     }}
                   >
@@ -474,7 +482,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
           )}
 
           {onClose && (
-            <div style={{ marginTop: '18px' }}>
+            <div style={{ marginTop: '10px' }}>
               <button
                 type="button"
                 onClick={onClose}
@@ -482,7 +490,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({ isOpen, onSucces
                   background: 'none',
                   border: 'none',
                   color: 'var(--adm-text-subtle)',
-                  fontSize: '12.5px',
+                  fontSize: '11.5px',
                   cursor: 'pointer',
                 }}
               >
