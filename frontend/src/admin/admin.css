@@ -1,6 +1,9 @@
 /* CineCraft Media - High-Performance Admin Dashboard & Dynamic CMS Styles */
 
 :root, [data-theme="dark"] {
+  --font-heading: 'Owners Wide', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-script: 'Scribo', cursive, sans-serif;
+  --swatch--light: #fcf2bd;
   --adm-bg: #090a0f;
   --adm-surface: #111218;
   --adm-surface-light: #181a24;
@@ -114,15 +117,17 @@
 }
 
 [data-theme="light"] .adm-brand-craft {
-  color: #000000 !important;
+  color: #1c1815 !important;
 }
 
-[data-theme="dark"] .adm-brand-craft {
-  color: var(--swatch--light, #fcf2bd) !important;
+[data-theme="dark"] .adm-brand-craft,
+:root:not([data-theme="light"]) .adm-brand-craft {
+  color: #fcf2bd !important;
 }
 
 [data-theme="light"] .adm-brand-cine,
-[data-theme="dark"] .adm-brand-cine {
+[data-theme="dark"] .adm-brand-cine,
+:root:not([data-theme="light"]) .adm-brand-cine {
   color: #ff5121 !important;
 }
 

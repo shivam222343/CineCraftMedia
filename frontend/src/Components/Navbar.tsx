@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CinecraftMediaLogo } from './Icons';
-import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   onNavigateSection?: (sectionId: string) => void;
@@ -83,9 +82,6 @@ const AnimatedUnderline: React.FC<AnimatedUnderlineProps> = ({
 };
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
   const [scrolled, setScrolled] = useState(false);
   const [activeHover, setActiveHover] = useState<NavKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -175,10 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
 
   const getLinkColor = (key: NavKey) => {
     if (isStudiosTheme) {
-      if (isDark) {
-        return activeHover === key ? '#ffffff' : 'rgba(255, 255, 255, 0.7)';
-      }
-      return activeHover === key ? '#055dff' : '#5b6978';
+      return activeHover === key ? '#0d1522' : '#5b6978';
     }
     if (activeHover) {
       return activeHover === key ? '#ff5121' : 'var(--swatch--light-o60)';
@@ -750,7 +743,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                           fontWeight: 700,
                           letterSpacing: '0.3px',
                           textTransform: 'lowercase',
-                          color: isDark ? '#ffffff' : '#0d1522',
+                          color: '#0d1522',
                         }}
                       >
                         craft
@@ -765,7 +758,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                       fontSize: '13px',
                       lineHeight: '1.55',
                       marginBottom: '16px',
-                      color: isDark ? 'rgba(255, 255, 255, 0.9)' : '#28323e',
+                      color: '#28323e',
                     }}
                   >
                     There’s another side to what we do. Through Cinecraft Studios, we bring the same creative craft and production expertise to brands, music and commercial campaigns.
@@ -1071,39 +1064,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
 
         /* CCM Studios Exclusive Cinematic Transition & Light Flare Sweep */
         .desktop-nav-card.ccm-studios-popup-active,
-        [data-theme="dark"] .desktop-nav-card.ccm-studios-popup-active {
-          background: linear-gradient(145deg, #0e1526 0%, #141e38 50%, #0a0f1e 100%) !important;
-          border: 1px solid rgba(5, 93, 255, 0.45) !important;
-          box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.5),
-                      0 0 40px rgba(5, 93, 255, 0.28),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-          position: relative;
-          overflow: hidden;
-          animation: ccmCardAuraBloomDark 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
+        [data-theme="dark"] .desktop-nav-card.ccm-studios-popup-active,
         [data-theme="light"] .desktop-nav-card.ccm-studios-popup-active {
           background: linear-gradient(145deg, #f0f7ff 0%, #e1effa 45%, #d4eafd 100%) !important;
           border: 1px solid rgba(5, 93, 255, 0.35) !important;
           box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.35),
                       0 0 35px rgba(5, 93, 255, 0.2),
                       inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+          position: relative;
+          overflow: hidden;
           animation: ccmCardAuraBloomLight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Typography theming for dark & light modes inside CCM Studios popup */
+        /* Typography theming for dark & light modes inside CCM Studios popup - exact light theme appearance */
         .ccm-craft-text,
-        [data-theme="dark"] .ccm-craft-text {
-          color: #ffffff !important;
-        }
+        [data-theme="dark"] .ccm-craft-text,
         [data-theme="light"] .ccm-craft-text {
           color: #0d1522 !important;
         }
 
         .ccm-studios-desc,
-        [data-theme="dark"] .ccm-studios-desc {
-          color: rgba(255, 255, 255, 0.85) !important;
-        }
+        [data-theme="dark"] .ccm-studios-desc,
         [data-theme="light"] .ccm-studios-desc {
           color: #28323e !important;
         }
@@ -1119,9 +1100,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
           background: linear-gradient(
             108deg,
             transparent 25%,
-            rgba(255, 255, 255, 0.5) 45%,
-            rgba(5, 93, 255, 0.4) 50%,
-            rgba(255, 255, 255, 0.7) 54%,
+            rgba(255, 255, 255, 0.65) 45%,
+            rgba(5, 93, 255, 0.32) 50%,
+            rgba(255, 255, 255, 0.8) 54%,
             transparent 72%
           );
           pointer-events: none;

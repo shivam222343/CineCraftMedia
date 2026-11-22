@@ -277,7 +277,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
                 <span
                   className="adm-brand-cine"
                   style={{
-                    fontFamily: 'var(--font-script)',
+                    fontFamily: 'var(--font-script, "Scribo", cursive, sans-serif)',
                     fontSize: '22px',
                     fontWeight: 400,
                     color: '#ff5121',
@@ -291,12 +291,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPublicSi
                 <span
                   className="adm-brand-craft"
                   style={{
-                    fontFamily: 'var(--font-heading)',
+                    fontFamily: 'var(--font-heading, "Owners Wide", -apple-system, BlinkMacSystemFont, sans-serif)',
                     fontSize: '16px',
                     fontWeight: 700,
                     letterSpacing: '0.3px',
                     textTransform: 'lowercase',
                     lineHeight: 1,
+                    color: activeTheme === 'light' ? '#1c1815' : '#fcf2bd',
                   }}
                 >
                   craft
