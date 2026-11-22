@@ -5,12 +5,14 @@ export const StudiosBanner: React.FC = () => {
   return (
     <section
       id="studios"
+      className="studios-banner-section"
       style={{
-        backgroundColor: '#171822',
+        backgroundColor: 'var(--swatch--studios-bg, #171822)',
         padding: '120px 48px',
         position: 'relative',
         overflow: 'hidden',
-        borderTop: '1px solid rgba(5, 93, 255, 0.2)',
+        borderTop: '1px solid var(--swatch--studios-border, rgba(5, 93, 255, 0.2))',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
       }}
     >
       {/* Subtle Blue Ambient Glow */}
@@ -22,7 +24,7 @@ export const StudiosBanner: React.FC = () => {
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          backgroundColor: 'rgba(5, 93, 255, 0.15)',
+          backgroundColor: 'rgba(5, 93, 255, 0.12)',
           filter: 'blur(100px)',
           pointerEvents: 'none',
         }}
@@ -62,7 +64,7 @@ export const StudiosBanner: React.FC = () => {
                   fontFamily: 'var(--font-heading)',
                   fontSize: '20px',
                   fontWeight: 700,
-                  color: '#ffffff',
+                  color: 'var(--swatch--studios-text, #ffffff)',
                   letterSpacing: '0.3px',
                   textTransform: 'lowercase',
                 }}
@@ -77,7 +79,7 @@ export const StudiosBanner: React.FC = () => {
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(32px, 4.5vw, 54px)',
               fontWeight: 700,
-              color: '#ffffff',
+              color: 'var(--swatch--studios-text, #ffffff)',
               lineHeight: 1.15,
               marginBottom: '24px',
               letterSpacing: '-1px',
@@ -90,7 +92,7 @@ export const StudiosBanner: React.FC = () => {
             style={{
               fontSize: '16px',
               lineHeight: 1.6,
-              color: 'rgba(255, 255, 255, 0.75)',
+              color: 'var(--swatch--studios-sub, rgba(255, 255, 255, 0.75))',
               marginBottom: '36px',
               maxWidth: '520px',
             }}
@@ -155,9 +157,13 @@ export const StudiosBanner: React.FC = () => {
 
       <style>{`
         @media (max-width: 900px) {
+          .studios-banner-section {
+            padding: 70px 14px !important; /* 10-15px mobile border side padding */
+          }
           .studios-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 24px !important;
+            padding: 0 !important;
           }
         }
       `}</style>

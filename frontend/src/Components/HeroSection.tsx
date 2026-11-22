@@ -87,7 +87,7 @@ export const HeroSection: React.FC = () => {
               maxHeight: 'calc(100vh - 48px)',
               borderRadius: '16px',
               overflow: 'hidden',
-              backgroundColor: '#1b1614',
+              backgroundColor: 'var(--swatch--dark-card)',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.45)',
             }}
           >
@@ -255,12 +255,12 @@ export const HeroSection: React.FC = () => {
           .hero-visual-wrap {
             width: 100% !important;
             height: 55vh !important;
-            padding: 80px 20px 20px !important;
+            padding: 72px 14px 10px !important; /* 10-15px mobile border side padding */
           }
           .hero-content-wrap {
             width: 100% !important;
             height: auto !important;
-            padding: 20px 20px 140px !important;
+            padding: 14px 14px 120px !important; /* 10-15px mobile border side padding */
           }
           .hero-bottom-logo {
             left: 50% !important;
@@ -270,7 +270,7 @@ export const HeroSection: React.FC = () => {
             width: 100% !important;
             max-width: 100vw !important;
             bottom: 24px !important;
-            padding: 0 16px !important;
+            padding: 0 14px !important; /* 10-15px padding */
             box-sizing: border-box !important;
           }
           .hero-bottom-logo span:first-child {

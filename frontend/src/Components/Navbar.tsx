@@ -174,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
       return activeHover === key ? '#0d1522' : '#5b6978';
     }
     if (activeHover) {
-      return activeHover === key ? '#ffffff' : 'rgba(252, 242, 189, 0.45)';
+      return activeHover === key ? '#ff5121' : 'var(--swatch--light-o60)';
     }
     return 'var(--swatch--light)';
   };
@@ -244,33 +244,35 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
 
         {/* Right Desktop Nav Card Container */}
         <div
-          className="desktop-nav-card"
+          className={`desktop-nav-card ${isStudiosTheme ? 'ccm-studios-popup-active' : ''}`}
           onMouseEnter={handleContainerMouseEnter}
           onMouseLeave={handleContainerMouseLeave}
           style={{
             pointerEvents: 'auto',
             width: '430px',
             maxWidth: 'calc(100vw - 72px)',
-            maxHeight: isDropdownOpen ? 'calc(100vh - 40px)' : 'none',
-            overflowY: isDropdownOpen ? 'auto' : 'visible',
+            height: isStudiosTheme ? 'auto' : undefined,
+            maxHeight: isStudiosTheme ? 'none' : isDropdownOpen ? 'calc(100vh - 40px)' : 'none',
+            overflowY: isStudiosTheme ? 'hidden' : isDropdownOpen ? 'auto' : 'visible',
+            overflow: isStudiosTheme ? 'hidden' : undefined,
             borderRadius: '24px',
             backgroundColor: isStudiosTheme
-              ? '#e1effa'
+              ? undefined
               : isDropdownOpen
-                ? '#211c19'
+                ? 'var(--swatch--card-bg, #211c19)'
                 : scrolled
-                  ? 'rgba(33, 28, 25, 0.85)'
+                  ? 'var(--swatch--panel-bg, rgba(33, 28, 25, 0.85))'
                   : 'transparent',
             backdropFilter: !isDropdownOpen && scrolled ? 'blur(16px)' : 'none',
             border: isStudiosTheme
-              ? '1px solid rgba(5, 93, 255, 0.18)'
+              ? undefined
               : isDropdownOpen
-                ? '1px solid rgba(252, 242, 189, 0.12)'
+                ? '1px solid var(--swatch--dark-border, rgba(252, 242, 189, 0.12))'
                 : scrolled
-                  ? '1px solid rgba(252, 242, 189, 0.08)'
+                  ? '1px solid var(--swatch--dark-border, rgba(252, 242, 189, 0.08))'
                   : '1px solid transparent',
             boxShadow: isStudiosTheme
-              ? '0 24px 60px rgba(0, 0, 0, 0.35)'
+              ? undefined
               : isDropdownOpen
                 ? '0 24px 60px rgba(0, 0, 0, 0.7)'
                 : 'none',
@@ -461,32 +463,59 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
               key={activeHover}
               className="nav-dropdown-enter"
               style={{
-                marginTop: '18px',
-                paddingTop: '16px',
+                marginTop: isStudiosTheme ? '14px' : '18px',
+                paddingTop: isStudiosTheme ? '12px' : '16px',
                 borderTop: isStudiosTheme
                   ? '1px solid rgba(5, 93, 255, 0.12)'
                   : '1px solid rgba(252, 242, 189, 0.08)',
               }}
             >
-              {/* Dropdown Panel 1: WORK (Screenshot 1) */}
+              {/* Dropdown Panel 1: WORK */}
               {activeHover === 'work' && (
-                <div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {/* Scrollable Work items list with compact height */}
+                  <div
+                    className="nav-work-scroll"
+                    style={{
+                      maxHeight: '260px',
+                      overflowY: 'auto',
+                      overflowX: 'hidden',
+                      paddingRight: '6px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                    }}
+                  >
                     {[
                       {
                         title: 'THE VALLEY RUN',
-                        type: 'Automotive, Drones & Trackside',
+                        type: 'High-Speed Drag Racing, FPV Drones & Trackside Cinematography',
                         img: '/media/work/Valley.webp',
                       },
                       {
-                        title: 'SUNBURN KOLHAPUR',
-                        type: 'Music Festival & Aerial Production',
-                        img: '/media/work/Sunburn.webp',
+                        title: 'FAST AND FABULOUS',
+                        type: 'Exotic Supercar Convoy & Lifestyle Festival',
+                        img: '/media/work/fast_and_fabulous.jpg',
                       },
                       {
-                        title: 'LOLLAPALOOZA 2K25',
-                        type: 'Live Festival Cinematography',
-                        img: '/media/work/Lollapalooza_2k25.webp',
+                        title: 'INDIAN SUPERCROSS RACING LEAGUE',
+                        type: 'International Stadium Supercross Championship',
+                        img: '/media/work/supercross_racing.jpg',
+                      },
+                      {
+                        title: 'DECCAN HILL RUN',
+                        type: 'Western Ghats Mountain Marathon & Hill Sprint',
+                        img: '/media/work/deccan_hill_run.jpg',
+                      },
+                      {
+                        title: 'AUTOMOTIVE COMMERCIALS',
+                        type: 'Brixton Motorcycles & Turtle Wax Studio Commercials',
+                        img: '/media/work/automotive_commercials.jpg',
+                      },
+                      {
+                        title: 'CONCERTS & MUSIC FESTIVALS',
+                        type: 'Hello Seoul • Lollapalooza • Sunburn Kop • Bryan Adams (Goa & Hyd)',
+                        img: '/media/work/Sunburn.webp',
                       },
                     ].map((p, i) => (
                       <div
@@ -495,14 +524,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '16px',
-                          padding: '6px',
+                          gap: '14px',
+                          padding: '6px 8px',
                           borderRadius: '12px',
                           cursor: 'pointer',
                           transition: 'background-color 0.2s ease, transform 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(252, 242, 189, 0.04)';
+                          e.currentTarget.style.backgroundColor = 'var(--swatch--light-o10)';
                           e.currentTarget.style.transform = 'translateX(4px)';
                         }}
                         onMouseLeave={(e) => {
@@ -514,10 +543,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                           src={p.img}
                           alt={p.title}
                           style={{
-                            width: '68px',
-                            height: '68px',
+                            width: '58px',
+                            height: '58px',
                             objectFit: 'cover',
-                            borderRadius: '12px',
+                            borderRadius: '10px',
                             flexShrink: 0,
                           }}
                         />
@@ -525,11 +554,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                           <div
                             style={{
                               fontFamily: 'var(--font-heading)',
-                              fontSize: '14px',
+                              fontSize: '13.5px',
                               fontWeight: 700,
                               color: 'var(--swatch--light)',
-                              letterSpacing: '0.6px',
+                              letterSpacing: '0.5px',
                               textTransform: 'uppercase',
+                              lineHeight: 1.25,
                             }}
                           >
                             {p.title}
@@ -537,9 +567,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                           <div
                             style={{
                               fontFamily: 'var(--font-body)',
-                              fontSize: '12px',
-                              color: 'rgba(252, 242, 189, 0.65)',
-                              marginTop: '4px',
+                              fontSize: '11.5px',
+                              color: 'var(--swatch--text-sub)',
+                              marginTop: '3px',
                               lineHeight: 1.35,
                             }}
                           >
@@ -550,32 +580,45 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                     ))}
                   </div>
 
-                  {/* All work button */}
-                  <button
-                    onClick={(e) => handleLinkClick('featured-projects', e)}
+                  {/* Fixed / Sticky Bottom Bar with "All work" CTA Button */}
+                  <div
                     style={{
-                      width: '100%',
-                      padding: '13px 20px',
-                      backgroundColor: '#ff4d25',
-                      color: '#ffffff',
-                      borderRadius: '9999px',
-                      border: 'none',
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'background-color 0.2s ease, transform 0.15s ease',
+                      position: 'sticky',
+                      bottom: 0,
+                      marginTop: '12px',
+                      paddingTop: '12px',
+                      borderTop: '1px solid var(--swatch--dark-border)',
+                      backgroundColor: 'inherit',
+                      zIndex: 3,
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#ff603a')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ff4d25')}
                   >
-                    <span>All work</span>
-                    <span style={{ fontSize: '15px' }}>→</span>
-                  </button>
+                    <button
+                      onClick={(e) => handleLinkClick('featured-projects', e)}
+                      style={{
+                        width: '100%',
+                        padding: '12px 20px',
+                        backgroundColor: '#ff5121',
+                        color: '#ffffff',
+                        borderRadius: '9999px',
+                        border: 'none',
+                        fontFamily: 'var(--font-heading)',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'background-color 0.2s ease, transform 0.15s ease',
+                        boxShadow: '0 6px 20px rgba(255, 81, 33, 0.35)',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#ff673b')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ff5121')}
+                    >
+                      <span>All work</span>
+                      <span style={{ fontSize: '15px' }}>→</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -584,12 +627,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                 <div>
                   <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '16px' }}>
                     {[
-                      { name: 'CINEMATOGRAPHY', target: 'services-stack', isEquipment: false },
                       { name: 'PHOTOGRAPHY', target: 'services-stack', isEquipment: false },
                       { name: 'VIDEOGRAPHY', target: 'services-stack', isEquipment: false },
-                      { name: 'EDITING', target: 'services-stack', isEquipment: false },
-                      { name: 'EVENT MANAGEMENT', target: 'services-stack', isEquipment: false },
-                      { name: 'PRODUCTION', target: 'services-stack', isEquipment: false },
+                      { name: 'CINEMATOGRAPHY', target: 'services-stack', isEquipment: false },
+                      { name: 'COMMERCIAL DRONE', target: 'services-stack', isEquipment: false },
+                      { name: 'FPV DRONE PROJECT', target: 'services-stack', isEquipment: false },
+                      { name: 'GRAPHICS DESIGNING', target: 'services-stack', isEquipment: false },
+                      { name: 'ANIMATION', target: 'services-stack', isEquipment: false },
+                      { name: 'VFX AND POST PRODUCTION', target: 'services-stack', isEquipment: false },
                       { name: 'EQUIPMENTS ↗', target: 'equipments', isEquipment: true },
                     ].map((s, idx, arr) => (
                       <div
@@ -674,7 +719,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
 
               {/* Dropdown Panel 3: Cinecraft Studios */}
               {activeHover === 'studios' && (
-                <div>
+                <div className="ccm-studios-content-panel" style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                     <CinecraftMediaLogo height={28} />
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: '1px' }}>
@@ -691,11 +736,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                         Cine
                       </span>
                       <span
+                        className="ccm-craft-text"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           fontSize: '16px',
                           fontWeight: 700,
-                          color: '#0d1522',
                           letterSpacing: '0.3px',
                           textTransform: 'lowercase',
                         }}
@@ -706,11 +751,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                   </div>
 
                   <p
+                    className="ccm-studios-desc"
                     style={{
                       fontFamily: 'var(--font-body)',
                       fontSize: '13px',
                       lineHeight: '1.55',
-                      color: '#28323e',
                       marginBottom: '16px',
                     }}
                   >
@@ -726,6 +771,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                       marginBottom: '16px',
                       boxShadow: '0 10px 28px rgba(5, 93, 255, 0.15)',
                       backgroundColor: '#0a101d',
+                      flexShrink: 0,
                     }}
                   >
                     <img
@@ -758,6 +804,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
+                      marginBottom: 0,
                       transition: 'background-color 0.2s ease, transform 0.15s ease',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#004ee0')}
@@ -819,7 +866,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
             position: 'fixed',
             inset: 0,
             zIndex: 999,
-            backgroundColor: '#1e1816',
+            backgroundColor: 'var(--swatch--body-bg, #1e1816)',
             padding: '90px 28px 40px',
             display: 'flex',
             flexDirection: 'column',
@@ -876,12 +923,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
               {servicesAccordionOpen && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px', paddingLeft: '12px' }}>
                   {[
-                    { name: 'Cinematography', target: 'services-stack', isEquipment: false },
                     { name: 'Photography', target: 'services-stack', isEquipment: false },
                     { name: 'Videography', target: 'services-stack', isEquipment: false },
-                    { name: 'Editing', target: 'services-stack', isEquipment: false },
-                    { name: 'Event Management', target: 'services-stack', isEquipment: false },
-                    { name: 'Production', target: 'services-stack', isEquipment: false },
+                    { name: 'Cinematography', target: 'services-stack', isEquipment: false },
+                    { name: 'Commercial Drone', target: 'services-stack', isEquipment: false },
+                    { name: 'FPV Drone Project', target: 'services-stack', isEquipment: false },
+                    { name: 'Graphics Designing', target: 'services-stack', isEquipment: false },
+                    { name: 'Animation', target: 'services-stack', isEquipment: false },
+                    { name: 'VFX & Post Production', target: 'services-stack', isEquipment: false },
                     { name: 'Equipments ↗', target: 'equipments', isEquipment: true },
                   ].map((s, idx) => (
                     <div
@@ -954,7 +1003,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
             <div style={{ color: 'var(--swatch--light-o60)', fontSize: '13px', lineHeight: 1.6 }}>
               360° creative agency for TV &amp; entertainment.
               <br />
-              London &bull; Soho &bull; Worldwide
+              Kolhapur &bull; Maharashtra &bull; Worldwide
             </div>
           </div>
         </div>
@@ -982,6 +1031,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
           }
         }
 
+        .nav-work-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .nav-work-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .nav-work-scroll::-webkit-scrollbar-thumb {
+          background: var(--swatch--dark-border);
+          border-radius: 4px;
+        }
+        .nav-work-scroll::-webkit-scrollbar-thumb:hover {
+          background: var(--swatch--brand);
+        }
+
         .nav-dropdown-enter {
           animation: navDropdownFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -994,6 +1057,133 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigateSection }) => {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+
+        /* CCM Studios Exclusive Cinematic Transition & Light Flare Sweep */
+        .desktop-nav-card.ccm-studios-popup-active,
+        [data-theme="dark"] .desktop-nav-card.ccm-studios-popup-active {
+          background: linear-gradient(145deg, #0e1526 0%, #141e38 50%, #0a0f1e 100%) !important;
+          border: 1px solid rgba(5, 93, 255, 0.45) !important;
+          box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.5),
+                      0 0 40px rgba(5, 93, 255, 0.28),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+          position: relative;
+          overflow: hidden;
+          animation: ccmCardAuraBloomDark 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        [data-theme="light"] .desktop-nav-card.ccm-studios-popup-active {
+          background: linear-gradient(145deg, #f0f7ff 0%, #e1effa 45%, #d4eafd 100%) !important;
+          border: 1px solid rgba(5, 93, 255, 0.35) !important;
+          box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.35),
+                      0 0 35px rgba(5, 93, 255, 0.2),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+          animation: ccmCardAuraBloomLight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Typography theming for dark & light modes inside CCM Studios popup */
+        .ccm-craft-text,
+        [data-theme="dark"] .ccm-craft-text {
+          color: #ffffff !important;
+        }
+        [data-theme="light"] .ccm-craft-text {
+          color: #0d1522 !important;
+        }
+
+        .ccm-studios-desc,
+        [data-theme="dark"] .ccm-studios-desc {
+          color: rgba(255, 255, 255, 0.85) !important;
+        }
+        [data-theme="light"] .ccm-studios-desc {
+          color: #28323e !important;
+        }
+
+        /* Prismatic light sweep ray across the card on hover */
+        .desktop-nav-card.ccm-studios-popup-active::before {
+          content: '';
+          position: absolute;
+          top: -60%;
+          left: -60%;
+          width: 220%;
+          height: 220%;
+          background: linear-gradient(
+            108deg,
+            transparent 25%,
+            rgba(255, 255, 255, 0.5) 45%,
+            rgba(5, 93, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0.7) 54%,
+            transparent 72%
+          );
+          pointer-events: none;
+          animation: ccmLightSweep 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          z-index: 1;
+        }
+
+        .ccm-studios-content-panel {
+          position: relative;
+          z-index: 2;
+          animation: ccmContentReveal 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes ccmCardAuraBloomDark {
+          0% {
+            filter: brightness(0.9);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+          }
+          45% {
+            box-shadow: 0 32px 85px -10px rgba(5, 93, 255, 0.6),
+                        0 0 50px rgba(5, 93, 255, 0.4);
+          }
+          100% {
+            filter: brightness(1);
+            box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.5),
+                        0 0 40px rgba(5, 93, 255, 0.28),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          }
+        }
+
+        @keyframes ccmCardAuraBloomLight {
+          0% {
+            filter: brightness(0.92);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+          }
+          45% {
+            box-shadow: 0 32px 85px -10px rgba(5, 93, 255, 0.45),
+                        0 0 45px rgba(5, 93, 255, 0.3);
+          }
+          100% {
+            filter: brightness(1);
+            box-shadow: 0 28px 70px -10px rgba(5, 93, 255, 0.35),
+                        0 0 35px rgba(5, 93, 255, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+          }
+        }
+
+        @keyframes ccmLightSweep {
+          0% {
+            transform: translateX(-100%) rotate(-12deg);
+            opacity: 0;
+          }
+          25% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100%) rotate(-12deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes ccmContentReveal {
+          0% {
+            opacity: 0;
+            transform: translateY(6px);
+            filter: blur(2px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
           }
         }
 

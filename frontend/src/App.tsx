@@ -11,6 +11,9 @@ import { Footer } from './Components/Footer';
 import { PageTransition } from './Components/PageTransition';
 import { WhatsAppButton } from './Components/WhatsAppButton';
 import { EquipmentsPage } from './Components/EquipmentsPage';
+import { AdminDashboard } from './admin/AdminDashboard';
+import { ThemeProvider } from './context/ThemeContext';
+import { ThemeToggle } from './Components/ThemeToggle';
 
 // Color themes for each nav destination's organic stroke transition
 const SECTION_TRANSITION_COLORS: Record<string, string> = {
@@ -22,13 +25,16 @@ const SECTION_TRANSITION_COLORS: Record<string, string> = {
   'hero': '#ff5121',
   'home': '#ff5121',
   'equipments': '#0d9488', // Deep Cinema Teal / Cyan transition for Equipments
+  'admin': '#ff5121',
 };
 
 function App() {
-  const [currentRoute, setCurrentRoute] = useState<'home' | 'equipments'>(() => {
-    return typeof window !== 'undefined' && window.location.pathname.startsWith('/equipments')
-      ? 'equipments'
-      : 'home';
+  const [currentRoute, setCurrentRoute] = useState<'home' | 'equipments' | 'admin'>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname.startsWith('/admin')) return 'admin';
+      if (window.location.pathname.startsWith('/equipments')) return 'equipments';
+    }
+    return 'home';
   });
 
   const [transitionState, setTransitionState] = useState<{
@@ -41,17 +47,39 @@ function App() {
     color: '#670b22',
   });
 
-  // Listen to browser forward/back buttons
+  // Listen to browser forward/back buttons & dev keyboard shortcut (Alt + A) for Admin
   useEffect(() => {
     const handlePopState = () => {
-      const isEquipments = window.location.pathname.startsWith('/equipments');
-      setCurrentRoute(isEquipments ? 'equipments' : 'home');
+      if (window.location.pathname.startsWith('/admin')) {
+        setCurrentRoute('admin');
+      } else if (window.location.pathname.startsWith('/equipments')) {
+        setCurrentRoute('equipments');
+      } else {
+        setCurrentRoute('home');
+      }
       window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        if (currentRoute === 'admin') {
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('home');
+        } else {
+          window.history.pushState({}, '', '/admin');
+          setCurrentRoute('admin');
+        }
+      }
+    };
+
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentRoute]);
 
   const handleNavigate = (sectionId: string) => {
     const transitionColor = SECTION_TRANSITION_COLORS[sectionId] || '#0d9488';
@@ -115,53 +143,71 @@ function App() {
   };
 
   return (
-    <div className="lxl-app-root">
-      {/* Full-Screen Organic SVG Page Transition with slow hand-drawn brush stroke */}
-      <PageTransition
-        active={transitionState.active}
-        phase={transitionState.phase}
-        color={transitionState.color}
-      />
+    <ThemeProvider>
+      <div className="lxl-app-root">
+        {/* Full-Screen Organic SVG Page Transition with slow hand-drawn brush stroke */}
+        <PageTransition
+          active={transitionState.active}
+          phase={transitionState.phase}
+          color={transitionState.color}
+        />
 
-      {currentRoute === 'equipments' ? (
-        <>
-          {/* Standalone Equipments Page (/equipments) */}
-          <EquipmentsPage onBackToHome={() => handleNavigate('home')} />
+        {currentRoute === 'admin' ? (
+          <AdminDashboard
+            onBackToPublicSite={() => {
+              if (window.location.pathname !== '/') {
+                window.history.pushState({}, '', '/');
+              }
+              setCurrentRoute('home');
+              window.scrollTo({ top: 0, behavior: 'instant' });
+            }}
+          />
+        ) : currentRoute === 'equipments' ? (
+          <>
+            {/* Standalone Equipments Page (/equipments) */}
+            <EquipmentsPage onBackToHome={() => handleNavigate('home')} />
 
-          {/* Floating Interactive WhatsApp Inquiry Button */}
-          <WhatsAppButton />
-        </>
-      ) : (
-        <>
-          {/* Main Navigation with Mega Dropdowns & Custom Underlines */}
-          <Navbar onNavigateSection={handleNavigate} />
+            {/* Floating Interactive WhatsApp Inquiry Button */}
+            <WhatsAppButton />
 
-          {/* Hero Section */}
-          <HeroSection />
+            {/* Global Theme Toggle */}
+            <ThemeToggle />
+          </>
+        ) : (
+          <>
+            {/* Main Navigation with Mega Dropdowns & Custom Underlines */}
+            <Navbar onNavigateSection={handleNavigate} />
 
-          {/* Video Zoom & Display Statement Section */}
-          <VideoScrollSection />
+            {/* Hero Section */}
+            <HeroSection />
 
-          {/* Services Card Stacking Deck */}
-          <CardStackSection onNavigateEquipments={() => handleNavigate('equipments')} />
+            {/* Video Zoom & Display Statement Section */}
+            <VideoScrollSection />
 
-          {/* Featured Entertainment Projects Showcase */}
-          <FeaturedProjects />
+            {/* Services Card Stacking Deck */}
+            <CardStackSection onNavigateEquipments={() => handleNavigate('equipments')} />
 
-          {/* About & Ethos Section */}
-          <WhyLxL />
+            {/* Featured Entertainment Projects Showcase */}
+            <FeaturedProjects />
 
-          {/* Cinecraft Studios Commercial Extension */}
-          <StudiosBanner />
+            {/* About & Ethos Section */}
+            <WhyLxL />
 
-          {/* Agency Footer */}
-          <Footer />
+            {/* Cinecraft Studios Commercial Extension */}
+            <StudiosBanner />
 
-          {/* Floating Interactive WhatsApp Inquiry Button */}
-          <WhatsAppButton />
-        </>
-      )}
-    </div>
+            {/* Agency Footer */}
+            <Footer />
+
+            {/* Floating Interactive WhatsApp Inquiry Button */}
+            <WhatsAppButton />
+
+            {/* Global Theme Toggle */}
+            <ThemeToggle />
+          </>
+        )}
+      </div>
+    </ThemeProvider>
   );
 }
 

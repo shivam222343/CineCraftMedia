@@ -39,10 +39,13 @@
   font-display: swap;
 }
 
-:root {
-  --swatch--dark: #27201d;
-  --swatch--dark-card: #201a18;
+:root, [data-theme="dark"] {
+  --swatch--dark: #1b1614;
+  --swatch--dark-card: #241d1a;
+  --swatch--dark-surface: #2b2320;
+  --swatch--dark-border: rgba(252, 242, 189, 0.12);
   --swatch--light: #fcf2bd;
+  --swatch--light-card: #ffffff;
   --swatch--brand: #ff5121;
   --swatch--studios: #055dff;
   --swatch--white: #ffffff;
@@ -51,11 +54,102 @@
   --swatch--light-o40: rgba(252, 242, 189, 0.4);
   --swatch--light-o60: rgba(252, 242, 189, 0.6);
   --swatch--light-o80: rgba(252, 242, 189, 0.8);
-  --swatch--dark-o80: rgba(39, 32, 29, 0.85);
+  --swatch--dark-o80: rgba(27, 22, 20, 0.88);
+  --swatch--card-bg: #221b18;
+  --swatch--body-bg: #181412;
+  --swatch--text: #fcf2bd;
+  --swatch--text-sub: rgba(252, 242, 189, 0.72);
+  --swatch--panel-bg: rgba(30, 24, 21, 0.85);
+
+  /* Studios Banner Dedicated Theming */
+  --swatch--studios-bg: #141824;
+  --swatch--studios-border: rgba(5, 93, 255, 0.22);
+  --swatch--studios-text: #ffffff;
+  --swatch--studios-sub: rgba(255, 255, 255, 0.75);
+
+  /* Floating UI / WhatsApp Modal Theming */
+  --swatch--popup-bg: #1d1715;
+  --swatch--popup-border: rgba(252, 242, 189, 0.14);
+  --swatch--popup-card: rgba(252, 242, 189, 0.04);
+  --swatch--popup-card-hover: rgba(37, 211, 102, 0.12);
+  --swatch--popup-text: #fcf2bd;
+  --swatch--popup-sub: rgba(252, 242, 189, 0.65);
 
   --font-heading: 'Owners Wide', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-script: 'Scribo', cursive, sans-serif;
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root[data-theme="light"],
+html[data-theme="light"],
+body[data-theme="light"],
+[data-theme="light"],
+.light {
+  --swatch--dark: #fbf9f4;
+  --swatch--dark-card: #ffffff;
+  --swatch--dark-surface: #f3efe6;
+  --swatch--dark-border: rgba(30, 24, 20, 0.12);
+  --swatch--light: #1c1815;
+  --swatch--light-card: #1c1815;
+  --swatch--brand: #ff5121;
+  --swatch--studios: #055dff;
+  --swatch--white: #ffffff;
+  --swatch--light-o10: rgba(28, 24, 21, 0.08);
+  --swatch--light-o20: rgba(28, 24, 21, 0.16);
+  --swatch--light-o40: rgba(28, 24, 21, 0.45);
+  --swatch--light-o60: rgba(28, 24, 21, 0.72);
+  --swatch--light-o80: rgba(28, 24, 21, 0.9);
+  --swatch--dark-o80: rgba(251, 249, 244, 0.88);
+  --swatch--card-bg: #ffffff;
+  --swatch--body-bg: #f8f6f0;
+  --swatch--text: #1c1815;
+  --swatch--text-sub: #38312c;
+  --swatch--panel-bg: rgba(255, 255, 255, 0.92);
+
+  /* Studios Banner Dedicated Theming for Light Mode */
+  --swatch--studios-bg: #eef5fc;
+  --swatch--studios-border: rgba(5, 93, 255, 0.18);
+  --swatch--studios-text: #0d1522;
+  --swatch--studios-sub: #3d4c5e;
+
+  /* Floating UI / WhatsApp Modal Theming for Light Mode */
+  --swatch--popup-bg: #ffffff;
+  --swatch--popup-border: rgba(30, 24, 20, 0.12);
+  --swatch--popup-card: #f8f7f4;
+  --swatch--popup-card-hover: rgba(37, 211, 102, 0.12);
+  --swatch--popup-text: #1c1815;
+  --swatch--popup-sub: #5c534d;
+}
+
+/* Explicit Light Theme Overrides for Footer High-Contrast Legibility */
+[data-theme="light"] .main-footer-section,
+html[data-theme="light"] .main-footer-section,
+body[data-theme="light"] .main-footer-section,
+.light .main-footer-section {
+  background-color: #fbf9f4 !important;
+  color: #1c1815 !important;
+}
+
+[data-theme="light"] .main-footer-section p,
+html[data-theme="light"] .main-footer-section p,
+body[data-theme="light"] .main-footer-section p {
+  color: #38312c !important;
+}
+
+[data-theme="light"] .main-footer-section a,
+html[data-theme="light"] .main-footer-section a,
+body[data-theme="light"] .main-footer-section a {
+  color: #38312c;
+}
+
+[data-theme="light"] .main-footer-section a:hover {
+  color: #ff5121 !important;
+}
+
+[data-theme="light"] .main-footer-section input {
+  background-color: #ffffff !important;
+  color: #1c1815 !important;
+  border-color: rgba(30, 24, 20, 0.18) !important;
 }
 
 *, *::before, *::after {

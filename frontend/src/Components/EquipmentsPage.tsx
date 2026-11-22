@@ -164,16 +164,17 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
   };
 
   return (
-    <div style={{ backgroundColor: '#14100e', color: 'var(--swatch--light)', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: 'var(--swatch--dark)', color: 'var(--swatch--light)', minHeight: '100vh', transition: 'background-color 0.3s ease, color 0.3s ease' }}>
       {/* Top Floating Navigation Header */}
       <header
+        className="equipments-header"
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          backgroundColor: 'rgba(20, 16, 14, 0.92)',
+          backgroundColor: 'var(--swatch--dark-o80)',
           backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(252, 242, 189, 0.08)',
+          borderBottom: '1px solid var(--swatch--light-o10)',
           padding: '18px 48px',
         }}
       >
@@ -232,7 +233,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
               style={{
                 backgroundColor: 'transparent',
                 color: 'var(--swatch--light)',
-                border: '1px solid rgba(252, 242, 189, 0.18)',
+                border: '1px solid var(--swatch--dark-border)',
                 borderRadius: '9999px',
                 padding: '10px 22px',
                 fontFamily: 'var(--font-heading)',
@@ -245,12 +246,12 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(252, 242, 189, 0.08)';
+                e.currentTarget.style.backgroundColor = 'var(--swatch--light-o10)';
                 e.currentTarget.style.borderColor = 'var(--swatch--light)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(252, 242, 189, 0.18)';
+                e.currentTarget.style.borderColor = 'var(--swatch--dark-border)';
               }}
             >
               <span>← Back to Home</span>
@@ -296,6 +297,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
 
       {/* Main Hero Banner */}
       <section
+        className="equipments-hero"
         style={{
           padding: '80px 48px 40px',
           maxWidth: '1440px',
@@ -334,7 +336,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
               fontFamily: 'var(--font-body)',
               fontSize: '17px',
               lineHeight: 1.65,
-              color: 'rgba(252, 242, 189, 0.75)',
+              color: 'var(--swatch--text-sub)',
               maxWidth: '680px',
             }}
           >
@@ -352,7 +354,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
             gap: '10px',
             marginTop: '44px',
             paddingBottom: '20px',
-            borderBottom: '1px solid rgba(252, 242, 189, 0.08)',
+            borderBottom: '1px solid var(--swatch--dark-border)',
           }}
         >
           {CATEGORIES.map((cat) => {
@@ -366,11 +368,11 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
                   borderRadius: '9999px',
                   border: isSelected
                     ? '1px solid #0d9488'
-                    : '1px solid rgba(252, 242, 189, 0.12)',
+                    : '1px solid var(--swatch--dark-border)',
                   backgroundColor: isSelected
                     ? 'rgba(13, 148, 136, 0.18)'
-                    : 'rgba(252, 242, 189, 0.03)',
-                  color: isSelected ? '#5eead4' : 'rgba(252, 242, 189, 0.75)',
+                    : 'var(--swatch--light-o10)',
+                  color: isSelected ? '#0d9488' : 'var(--swatch--text-sub)',
                   fontFamily: 'var(--font-heading)',
                   fontSize: '13px',
                   fontWeight: 700,
@@ -380,14 +382,14 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'rgba(252, 242, 189, 0.06)';
-                    e.currentTarget.style.color = 'var(--swatch--light)';
+                    e.currentTarget.style.backgroundColor = 'rgba(13, 148, 136, 0.12)';
+                    e.currentTarget.style.color = '#0d9488';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'rgba(252, 242, 189, 0.03)';
-                    e.currentTarget.style.color = 'rgba(252, 242, 189, 0.75)';
+                    e.currentTarget.style.backgroundColor = 'var(--swatch--light-o10)';
+                    e.currentTarget.style.color = 'var(--swatch--text-sub)';
                   }
                 }}
               >
@@ -400,6 +402,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
 
       {/* Equipment Cards Grid */}
       <section
+        className="equipments-section"
         style={{
           padding: '20px 48px 100px',
           maxWidth: '1440px',
@@ -418,8 +421,8 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
             <div
               key={item.id}
               style={{
-                backgroundColor: '#1d1715',
-                border: '1px solid rgba(252, 242, 189, 0.1)',
+                backgroundColor: 'var(--swatch--dark-card)',
+                border: '1px solid var(--swatch--light-o10)',
                 borderRadius: '20px',
                 overflow: 'hidden',
                 display: 'flex',
@@ -429,13 +432,13 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-6px)';
                 e.currentTarget.style.boxShadow =
-                  '0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(13, 148, 136, 0.3)';
+                  '0 24px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(13, 148, 136, 0.3)';
                 e.currentTarget.style.borderColor = 'rgba(13, 148, 136, 0.4)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = 'none';
-                e.currentTarget.style.borderColor = 'rgba(252, 242, 189, 0.1)';
+                e.currentTarget.style.borderColor = 'var(--swatch--light-o10)';
               }}
             >
               {/* Image Preview with Badge Overlay */}
@@ -535,7 +538,7 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
                     fontFamily: 'var(--font-body)',
                     fontSize: '13.5px',
                     lineHeight: 1.6,
-                    color: 'rgba(252, 242, 189, 0.72)',
+                    color: 'var(--swatch--text-sub)',
                     marginBottom: '20px',
                     flex: 1,
                   }}
@@ -557,9 +560,9 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
                       key={idx}
                       style={{
                         fontSize: '11px',
-                        backgroundColor: 'rgba(252, 242, 189, 0.05)',
-                        border: '1px solid rgba(252, 242, 189, 0.08)',
-                        color: 'rgba(252, 242, 189, 0.85)',
+                        backgroundColor: 'var(--swatch--light-o10)',
+                        border: '1px solid var(--swatch--dark-border)',
+                        color: 'var(--swatch--text-sub)',
                         padding: '4px 10px',
                         borderRadius: '6px',
                         fontFamily: 'var(--font-body)',
@@ -613,10 +616,10 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
 
       {/* Bottom Production Consultation Banner */}
       <section
+        className="equipments-consult-banner"
         style={{
-          backgroundColor: '#191311',
-          borderTop: '1px solid rgba(252, 242, 189, 0.08)',
           padding: '80px 48px',
+          transition: 'background-color 0.3s ease, border-color 0.3s ease',
         }}
       >
         <div
@@ -637,11 +640,11 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
             Custom Gear &amp; Crew Packages
           </div>
           <h2
+            className="equipments-consult-title"
             style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(28px, 4vw, 48px)',
               fontWeight: 700,
-              color: 'var(--swatch--light)',
               lineHeight: 1.15,
               marginBottom: '18px',
             }}
@@ -649,9 +652,9 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
             NEED SPECIFIC PRODUCTION GEAR OR COMPLETE CREW?
           </h2>
           <p
+            className="equipments-consult-desc"
             style={{
               fontSize: '15px',
-              color: 'rgba(252, 242, 189, 0.7)',
               maxWidth: '600px',
               margin: '0 auto 32px',
               lineHeight: 1.6,
@@ -700,28 +703,69 @@ export const EquipmentsPage: React.FC<EquipmentsPageProps> = ({ onBackToHome }) 
 
       {/* Minimal Footer */}
       <footer
+        className="equipments-footer"
         style={{
           padding: '28px 48px',
-          borderTop: '1px solid rgba(252, 242, 189, 0.06)',
+          borderTop: '1px solid var(--swatch--dark-border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           maxWidth: '1440px',
           margin: '0 auto',
           fontSize: '13px',
-          color: 'rgba(252, 242, 189, 0.5)',
+          color: 'var(--swatch--text-sub)',
         }}
       >
         <div>&copy; {new Date().getFullYear()} Cinecraft Media. All rights reserved.</div>
-        <div onClick={onBackToHome} style={{ cursor: 'pointer', color: 'var(--swatch--light)' }}>
+        <div onClick={onBackToHome} style={{ cursor: 'pointer', color: 'var(--swatch--light)', fontWeight: 600 }}>
           ← Return to Cinecraft Home
         </div>
       </footer>
 
       <style>{`
+        .equipments-consult-banner,
+        [data-theme="dark"] .equipments-consult-banner {
+          background-color: var(--swatch--dark-surface, #2b2320);
+          border-top: 1px solid var(--swatch--dark-border, rgba(252, 242, 189, 0.12));
+        }
+        .equipments-consult-title,
+        [data-theme="dark"] .equipments-consult-title {
+          color: var(--swatch--light, #fcf2bd) !important;
+        }
+        .equipments-consult-desc,
+        [data-theme="dark"] .equipments-consult-desc {
+          color: var(--swatch--text-sub, rgba(252, 242, 189, 0.72)) !important;
+        }
+
+        [data-theme="light"] .equipments-consult-banner {
+          background-color: #f3efe6 !important;
+          border-top: 1px solid rgba(30, 24, 20, 0.12) !important;
+        }
+        [data-theme="light"] .equipments-consult-title {
+          color: #1c1815 !important;
+        }
+        [data-theme="light"] .equipments-consult-desc {
+          color: #38312c !important;
+        }
+
         @media (max-width: 800px) {
+          .equipments-header {
+            padding: 14px 14px !important; /* 10-15px mobile border side padding */
+          }
+          .equipments-hero {
+            padding: 50px 14px 24px !important; /* 10-15px padding */
+          }
+          .equipments-section {
+            padding: 10px 14px 60px !important; /* 10-15px padding */
+          }
+          .equipments-footer {
+            padding: 20px 14px !important; /* 10-15px padding */
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
           .equipments-grid {
             grid-template-columns: 1fr !important;
+            gap: 20px !important;
           }
         }
       `}</style>

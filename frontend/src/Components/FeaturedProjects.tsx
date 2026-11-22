@@ -15,45 +15,78 @@ const PROJECTS: Project[] = [
   {
     id: 'the-valley-run',
     title: 'THE VALLEY RUN',
-    stencilTitle: 'THE VALLEY RUN',
-    category: 'Automotive, Drones & High-Speed Coverage',
+    stencilTitle: 'VALLEY RUN',
+    category: 'High-Speed Drag Racing, FPV Drones & Trackside Cinematography',
     image: '/media/work/Valley.webp',
     client: 'The Valley Run Drag Racing',
-    services: ['Drones', 'Cameras', 'Automotive', 'Social Campaigns'],
+    services: ['Automotive', 'Racing', 'Drones'],
     description:
       'High-octane drag racing and automotive festival coverage featuring high-speed FPV drone tracking, precision trackside cinema cameras, and viral cinematic aftermovies.',
   },
   {
-    id: 'sunburn-kolhapur',
-    title: 'SUNBURN KOLHAPUR',
-    stencilTitle: 'SUNBURN',
-    category: 'Live Music Festival & Commercial Production',
-    image: '/media/work/Sunburn.webp',
-    client: 'Sunburn Festival',
-    services: ['Drones', 'Cameras', 'Live Events', 'Aftermovies'],
+    id: 'fast-and-fabulous',
+    title: 'FAST AND FABULOUS',
+    stencilTitle: 'FAST & FAB',
+    category: 'Exotic Supercar Convoy & Lifestyle Festival',
+    image: '/media/work/fast_and_fabulous.jpg',
+    client: 'Fast & Fabulous',
+    services: ['Automotive', 'Drones'],
     description:
-      "Electrifying festival production capture, sweeping crowd aerials, and high-energy stage visuals for Asia's premier electronic music festival experience.",
+      'Ultra-exclusive supercar rally and lifestyle automotive festival captured with car-to-car rolling rigs, high-altitude drone tracking, and cinematic aftermovies showcasing exotic horsepower.',
   },
   {
-    id: 'lollapalooza-2k25',
-    title: 'LOLLAPALOOZA 2K25',
-    stencilTitle: 'LOLLAPALOOZA',
-    category: 'Festival Cinematography & Live Production',
-    image: '/media/work/Lollapalooza_2k25.webp',
-    client: 'Lollapalooza India',
-    services: ['Cameras', 'Live Events', 'Drones', 'Aftermovies'],
+    id: 'indian-supercross',
+    title: 'INDIAN SUPERCROSS RACING LEAGUE',
+    stencilTitle: 'ISRL',
+    category: 'International Stadium Supercross Championship',
+    image: '/media/work/supercross_racing.jpg',
+    client: 'Indian Supercross Racing League (ISRL)',
+    services: ['Racing', 'Drones', 'Live Events'],
     description:
-      'Iconic multi-stage global music festival coverage in Mumbai with full cinema camera packages, dynamic artist tracking, and high-voltage aftermovie reels.',
+      "India's premier international stadium supercross dirt bike championship. Massive dirt jumps, floodlit stadium pyrotechnics, and high-speed FPV chasing riders mid-air.",
+  },
+  {
+    id: 'deccan-hill-run',
+    title: 'DECCAN HILL RUN',
+    stencilTitle: 'DECCAN RUN',
+    category: 'Western Ghats Mountain Marathon & Hill Sprint',
+    image: '/media/work/deccan_hill_run.jpg',
+    client: 'Deccan Hill Run',
+    services: ['Racing', 'Drones', 'Live Events'],
+    description:
+      'Iconic mountain marathon winding through the misty ghats of the Western Ghats. Sweeping high-altitude drone perspectives, athlete tracking, and inspirational cinematic recap films.',
+  },
+  {
+    id: 'automotive-commercials',
+    title: 'AUTOMOTIVE COMMERCIALS (BRIXTON & TURTLE WAX)',
+    stencilTitle: 'COMMERCIALS',
+    category: 'Brixton Motorcycles & Turtle Wax Studio Commercials',
+    image: '/media/work/automotive_commercials.jpg',
+    client: 'Brixton Motorcycles & Turtle Wax',
+    services: ['Commercials', 'Automotive'],
+    description:
+      'Bespoke brand commercial campaigns for Brixton Motorcycles and Turtle Wax detailing. Precision studio lighting, dynamic rolling shots, macro liquid physics, and theatrical color grading.',
+  },
+  {
+    id: 'concerts',
+    title: 'CONCERTS & MUSIC FESTIVALS',
+    stencilTitle: 'CONCERTS',
+    category: 'Hello Seoul • Lollapalooza • Sunburn Kop • Bryan Adams (Goa & Hyd)',
+    image: '/media/work/Sunburn.webp',
+    client: 'Global Concert Tours & Festival Promoters',
+    services: ['Concerts', 'Live Events', 'Drones'],
+    description:
+      'Mega-scale live concert coverage across Asia and India: Bryan Adams India Tour (Goa & Hyderabad), Lollapalooza Mumbai, Sunburn Festival, and Hello Seoul K-Pop Festival. Multi-cam broadcast, drone fly-overs, and electrifying aftermovies.',
   },
 ];
 
 const CATEGORIES = [
   'All',
-  'Drones',
-  'Cameras',
-  'Live Events',
   'Automotive',
-  'Aftermovies',
+  'Concerts',
+  'Racing',
+  'Commercials',
+  'Drones',
 ];
 
 export const FeaturedProjects: React.FC = () => {
@@ -68,11 +101,12 @@ export const FeaturedProjects: React.FC = () => {
   return (
     <section
       id="featured-projects"
+      className="featured-projects-section"
       style={{
-        backgroundColor: '#1e1816',
+        backgroundColor: 'var(--swatch--dark)',
         padding: '100px 48px 140px',
         position: 'relative',
-        borderTop: '1px solid rgba(252, 242, 189, 0.08)',
+        borderTop: '1px solid var(--swatch--light-o10)',
       }}
     >
       <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
@@ -119,25 +153,25 @@ export const FeaturedProjects: React.FC = () => {
                     key={cat}
                     onClick={() => setFilter(cat)}
                     style={{
-                      background: isSelected ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                      background: isSelected ? 'var(--swatch--light-o20)' : 'transparent',
                       border: 'none',
                       borderRadius: '9999px',
                       padding: '7px 18px',
                       width: 'fit-content',
                       fontFamily: 'var(--font-body)',
                       fontSize: '14.5px',
-                      fontWeight: isSelected ? 600 : 500,
-                      color: isSelected ? '#ffffff' : 'rgba(252, 242, 189, 0.65)',
+                      fontWeight: isSelected ? 700 : 500,
+                      color: isSelected ? 'var(--swatch--brand)' : 'var(--swatch--light-o60)',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.2s ease',
                       outline: 'none',
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.color = '#ffffff';
+                      if (!isSelected) e.currentTarget.style.color = 'var(--swatch--brand)';
                     }}
                     onMouseLeave={(e) => {
-                      if (!isSelected) e.currentTarget.style.color = 'rgba(252, 242, 189, 0.65)';
+                      if (!isSelected) e.currentTarget.style.color = 'var(--swatch--light-o60)';
                     }}
                   >
                     {cat}
@@ -158,10 +192,10 @@ export const FeaturedProjects: React.FC = () => {
                   position: 'relative',
                   borderRadius: '24px',
                   overflow: 'hidden',
-                  backgroundColor: '#1b1614',
-                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
+                  backgroundColor: 'var(--swatch--dark-card)',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.45)',
                   cursor: 'pointer',
-                  border: '1px solid rgba(252, 242, 189, 0.08)',
+                  border: '1px solid var(--swatch--light-o10)',
                   transition: 'border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease',
                 }}
                 onMouseEnter={(e) => {
@@ -235,10 +269,11 @@ export const FeaturedProjects: React.FC = () => {
                         fontFamily: 'var(--font-heading)',
                         fontSize: '19px',
                         fontWeight: 700,
-                        color: 'var(--swatch--light)',
+                        color: '#ffffff',
                         marginTop: '10px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.6px',
+                        textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
                       }}
                     >
                       {project.title}
@@ -248,8 +283,9 @@ export const FeaturedProjects: React.FC = () => {
                       style={{
                         fontFamily: 'var(--font-body)',
                         fontSize: '13.5px',
-                        color: 'rgba(252, 242, 189, 0.75)',
+                        color: 'rgba(255, 255, 255, 0.85)',
                         marginTop: '4px',
+                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
                       }}
                     >
                       {project.category}
@@ -281,13 +317,13 @@ export const FeaturedProjects: React.FC = () => {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#201a18',
+              backgroundColor: 'var(--swatch--dark-card)',
               borderRadius: '24px',
               maxWidth: '850px',
               width: '100%',
               overflow: 'hidden',
-              border: '1px solid rgba(252, 242, 189, 0.15)',
-              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.8)',
+              border: '1px solid var(--swatch--light-o20)',
+              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.6)',
             }}
           >
             <img
@@ -376,15 +412,29 @@ export const FeaturedProjects: React.FC = () => {
         }
 
         @media (max-width: 960px) {
+          .featured-projects-section {
+            padding: 70px 14px 100px !important; /* 10-15px mobile border side padding */
+          }
+
           .work-split-layout {
             flex-direction: column;
-            gap: 36px;
+            gap: 24px;
           }
 
           .work-left-sidebar {
             width: 100%;
             position: relative;
             top: 0;
+            padding: 0 !important;
+          }
+
+          .work-cards-stack {
+            padding: 0 !important;
+            gap: 24px !important;
+          }
+
+          .work-project-card {
+            border-radius: 16px !important;
           }
         }
       `}</style>

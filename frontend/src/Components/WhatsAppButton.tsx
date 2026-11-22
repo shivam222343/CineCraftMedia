@@ -11,39 +11,67 @@ interface InquiryOption {
 
 const INQUIRY_OPTIONS: InquiryOption[] = [
   {
-    id: 'drones',
-    title: 'Drone & Aerial Cinematography',
-    desc: 'FPV tracking, licensed DGCA pilots & 4K/ProRes aerials',
+    id: 'photography',
+    title: 'Photography',
+    desc: 'Fashion, editorial, concerts & brand product shoots',
     message:
-      "Hello Cinecraft Media! I'm reaching out to inquire about your Drone & Aerial Cinematography services for an upcoming project. Could you share package details and pilot availability?",
+      "Hello Cinecraft Media! I'm interested in inquiring about your Photography services for an upcoming shoot. Let's discuss details!",
   },
   {
-    id: 'cameras',
-    title: 'Cinema Cameras & Equipment',
-    desc: 'Cinema camera packages, prime glass & specialized rigs',
+    id: 'videography',
+    title: 'Videography',
+    desc: 'Live events, brand commercials, aftermovies & gimbal coverage',
     message:
-      "Hello Cinecraft Media! I'd like to inquire about your Cinema Camera packages and production gear for our upcoming shoot. Please share equipment specs and pricing.",
+      "Hello Cinecraft Media! I'd like to book / inquire about your Videography services for an upcoming project.",
   },
   {
-    id: 'production',
-    title: 'Commercial & Video Production',
-    desc: 'Full-scale creative commercial & brand campaigns',
+    id: 'cinematography',
+    title: 'Cinematography',
+    desc: 'Cinema camera packages, master lighting & narrative directing',
     message:
-      "Hello Cinecraft Media! We're planning a video production / commercial shoot and would love to collaborate with your team. Let's discuss details!",
+      "Hello Cinecraft Media! I'd like to collaborate regarding Cinematography for an upcoming commercial / feature film.",
   },
   {
-    id: 'key-art',
-    title: 'Key Art & Creative Campaigns',
-    desc: 'Poster design, visual identity & marketing key art',
+    id: 'commercial-drone',
+    title: 'Commercial Drone',
+    desc: 'Licensed DGCA pilots, high-altitude 8K ProRes aerial filming',
     message:
-      "Hello Cinecraft Media! I'm looking for Key Art poster design and visual campaign creative for our upcoming release.",
+      "Hello Cinecraft Media! I'm reaching out to inquire about your Commercial Drone aerial filming services.",
   },
   {
-    id: 'unit',
-    title: 'Unit Photography & BTS',
-    desc: 'On-set episodic stills & documentary BTS coverage',
+    id: 'fpv-drone',
+    title: 'FPV Drone Project',
+    desc: 'High-speed cinelifter chase & dynamic indoor fly-throughs',
     message:
-      "Hello Cinecraft Media! We need on-set unit photography and behind-the-scenes coverage for our upcoming production schedule.",
+      "Hello Cinecraft Media! I'd like to inquire about an FPV Drone Project for dynamic high-speed tracking.",
+  },
+  {
+    id: 'graphics-designing',
+    title: 'Graphics Designing',
+    desc: 'Movie key-art posters, visual branding & typography',
+    message:
+      "Hello Cinecraft Media! I need Graphics Designing and Key Art creative for our upcoming release / brand.",
+  },
+  {
+    id: 'animation',
+    title: 'Animation',
+    desc: '2D & 3D character animation, kinetic typography & CGI',
+    message:
+      "Hello Cinecraft Media! I would like to inquire about your 2D / 3D Animation and motion design services.",
+  },
+  {
+    id: 'vfx-post-production',
+    title: 'VFX and Post Production',
+    desc: 'CGI compositing, DaVinci Resolve color grading & sound mix',
+    message:
+      "Hello Cinecraft Media! I'm reaching out regarding VFX and Post Production finishing for our project.",
+  },
+  {
+    id: 'equipments',
+    title: 'Equipments Rental & Fleet',
+    desc: 'Cinema cameras, drones, prime lenses, lighting & audio rigs',
+    message:
+      "Hello Cinecraft Media! I would like to inquire about renting production equipment from your catalog.",
   },
   {
     id: 'general',
@@ -116,14 +144,15 @@ export const WhatsAppButton: React.FC = () => {
               right: '0',
               width: '360px',
               maxWidth: 'calc(100vw - 36px)',
-              backgroundColor: '#1d1715',
-              border: '1px solid rgba(252, 242, 189, 0.14)',
+              backgroundColor: 'var(--swatch--popup-bg)',
+              border: '1px solid var(--swatch--popup-border)',
               borderRadius: '20px',
-              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(37, 211, 102, 0.25)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(37, 211, 102, 0.25)',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               zIndex: 10000,
+              transition: 'background-color 0.25s ease, border-color 0.25s ease',
             }}
           >
             {/* Header with Green to Dark Green Gradient */}
@@ -215,7 +244,7 @@ export const WhatsAppButton: React.FC = () => {
                 style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: 'rgba(252, 242, 189, 0.6)',
+                  color: 'var(--swatch--popup-sub)',
                   marginBottom: '10px',
                   fontFamily: 'var(--font-heading)',
                   letterSpacing: '0.6px',
@@ -238,21 +267,21 @@ export const WhatsAppButton: React.FC = () => {
                       gap: '12px',
                       padding: '12px 14px',
                       borderRadius: '12px',
-                      border: '1px solid rgba(252, 242, 189, 0.08)',
-                      backgroundColor: 'rgba(252, 242, 189, 0.03)',
-                      color: 'var(--swatch--light)',
+                      border: '1px solid var(--swatch--popup-border)',
+                      backgroundColor: 'var(--swatch--popup-card)',
+                      color: 'var(--swatch--popup-text)',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(37, 211, 102, 0.12)';
+                      e.currentTarget.style.backgroundColor = 'var(--swatch--popup-card-hover)';
                       e.currentTarget.style.borderColor = 'rgba(37, 211, 102, 0.45)';
                       e.currentTarget.style.transform = 'translateX(4px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(252, 242, 189, 0.03)';
-                      e.currentTarget.style.borderColor = 'rgba(252, 242, 189, 0.08)';
+                      e.currentTarget.style.backgroundColor = 'var(--swatch--popup-card)';
+                      e.currentTarget.style.borderColor = 'var(--swatch--popup-border)';
                       e.currentTarget.style.transform = 'translateX(0)';
                     }}
                   >
@@ -262,7 +291,7 @@ export const WhatsAppButton: React.FC = () => {
                           fontFamily: 'var(--font-heading)',
                           fontSize: '13px',
                           fontWeight: 700,
-                          color: 'var(--swatch--light)',
+                          color: 'var(--swatch--popup-text)',
                           letterSpacing: '0.2px',
                           marginBottom: '2px',
                         }}
@@ -273,7 +302,7 @@ export const WhatsAppButton: React.FC = () => {
                         style={{
                           fontFamily: 'var(--font-body)',
                           fontSize: '11px',
-                          color: 'rgba(252, 242, 189, 0.6)',
+                          color: 'var(--swatch--popup-sub)',
                           lineHeight: 1.35,
                         }}
                       >

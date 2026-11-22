@@ -38,3 +38,11 @@
   background-color: var(--swatch--brand) !important;
   color: #ffffff !important;
 }
+
+@media (max-width: 768px) {
+  .lxl-app-root {
+    width: 100%;
+    overflow-x: clip;
+  }
+}
+

@@ -37,11 +37,12 @@ export const WhyLxL: React.FC = () => {
   return (
     <section
       id="why-lxl"
+      className="why-lxl-section"
       style={{
-        backgroundColor: '#27201d',
+        backgroundColor: 'var(--swatch--dark)',
         padding: '120px 48px',
         position: 'relative',
-        borderTop: '1px solid rgba(252, 242, 189, 0.08)',
+        borderTop: '1px solid var(--swatch--light-o10)',
       }}
     >
       <div
@@ -101,10 +102,10 @@ export const WhyLxL: React.FC = () => {
                   key={val.id}
                   onClick={() => setActiveTab(idx)}
                   style={{
-                    backgroundColor: isActive ? 'rgba(252, 242, 189, 0.08)' : 'rgba(252, 242, 189, 0.02)',
+                    backgroundColor: isActive ? 'var(--swatch--light-o10)' : 'var(--swatch--card-bg)',
                     border: isActive
                       ? '1px solid var(--swatch--brand)'
-                      : '1px solid rgba(252, 242, 189, 0.08)',
+                      : '1px solid var(--swatch--dark-border)',
                     borderRadius: '16px',
                     padding: '24px 28px',
                     cursor: 'pointer',
@@ -193,16 +194,17 @@ export const WhyLxL: React.FC = () => {
 
             {/* Subtle Overlay Badge */}
             <div
+              className="why-team-overlay-card"
               style={{
                 position: 'absolute',
                 bottom: '24px',
                 left: '24px',
                 right: '24px',
                 padding: '20px',
-                backgroundColor: 'rgba(39, 32, 29, 0.85)',
-                backdropFilter: 'blur(12px)',
+                backdropFilter: 'blur(16px)',
                 borderRadius: '12px',
-                border: '1px solid rgba(252, 242, 189, 0.15)',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+                transition: 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease',
               }}
             >
               <div
@@ -217,7 +219,10 @@ export const WhyLxL: React.FC = () => {
               >
                 ONE TEAM. FROM DAY ONE.
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--swatch--light-o80)', lineHeight: 1.5 }}>
+              <div
+                className="why-team-overlay-desc"
+                style={{ fontSize: '13px', lineHeight: 1.5, opacity: 0.95 }}
+              >
                 Embedded alongside directors, producers, and showrunners on the world’s biggest titles.
               </div>
             </div>
@@ -226,10 +231,32 @@ export const WhyLxL: React.FC = () => {
       </div>
 
       <style>{`
+        .why-team-overlay-card,
+        [data-theme="dark"] .why-team-overlay-card {
+          background-color: rgba(22, 17, 15, 0.88);
+          border: 1px solid rgba(252, 242, 189, 0.15);
+        }
+        .why-team-overlay-desc,
+        [data-theme="dark"] .why-team-overlay-desc {
+          color: #fcf2bd;
+        }
+
+        [data-theme="light"] .why-team-overlay-card {
+          background-color: rgba(255, 255, 255, 0.92);
+          border: 1px solid rgba(30, 24, 20, 0.12);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .why-team-overlay-desc {
+          color: #1c1815;
+        }
         @media (max-width: 900px) {
+          .why-lxl-section {
+            padding: 70px 14px !important; /* 10-15px mobile border side padding */
+          }
           .why-lxl-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 24px !important;
+            padding: 0 !important;
           }
         }
       `}</style>

@@ -11,19 +11,6 @@ interface ServiceItem {
 
 const SERVICES_DATA: ServiceItem[] = [
   {
-    id: 'cinematography',
-    title: 'CINEMATOGRAPHY',
-    image: '/media/services/cinematography.jpg',
-    description:
-      'Full-spectrum cinema direction, master framing, and dramatic camera movement crafted to bring high-impact visual stories, music videos, and commercial narratives to life.',
-    deliverables: [
-      'High-End Feature & Commercial Shoots',
-      'Anamorphic & Prime Lens Mastery',
-      'Lighting Design & Mood Realization',
-      'Directorial Vision & Storyboards',
-    ],
-  },
-  {
     id: 'photography',
     title: 'PHOTOGRAPHY',
     image: '/media/services/photography.jpg',
@@ -50,42 +37,81 @@ const SERVICES_DATA: ServiceItem[] = [
     ],
   },
   {
-    id: 'editing',
-    title: 'EDITING',
-    image: '/media/services/editing.jpg',
+    id: 'cinematography',
+    title: 'CINEMATOGRAPHY',
+    image: '/media/services/cinematography.jpg',
     description:
-      'Fast-paced storytelling, cinematic pacing, advanced color grading, sound design, and motion graphics that transform raw footage into captivating visual masterpieces.',
+      'Full-spectrum cinema direction, master framing, and dramatic camera movement crafted to bring high-impact visual stories, music videos, and commercial narratives to life.',
     deliverables: [
+      'High-End Feature & Commercial Shoots',
+      'Anamorphic & Prime Lens Mastery',
+      'Lighting Design & Mood Realization',
+      'Directorial Vision & Storyboards',
+    ],
+  },
+  {
+    id: 'commercial-drone',
+    title: 'COMMERCIAL DRONE',
+    image: '/media/services/commercial_drone.jpg',
+    description:
+      'Licensed high-altitude aerial cinematography, dual-operator cinema drone packages, and precision aerial survey tailored for high-end commercials, films, and industrial showcases.',
+    deliverables: [
+      'DGCA Certified Drone Pilots',
+      'DJI Inspire 3 & Mavic Cine Fleet',
+      'High-Altitude 8K ProRes RAW',
+      'Dual Operator Master Wheels Control',
+    ],
+  },
+  {
+    id: 'fpv-drone-project',
+    title: 'FPV DRONE PROJECT',
+    image: '/media/services/fpv_drone.jpg',
+    description:
+      'Adrenaline-fueled high-speed FPV tracking, cinelifter high-velocity chase sequences, and seamless indoor fly-throughs delivering angles impossible with standard cameras.',
+    deliverables: [
+      'Custom High-Speed Cinelifter Rigs',
+      'Automotive Chase & Action Sports Tracking',
+      'Micro-FPV One-Take Indoor Fly-Throughs',
+      'Ultra-Smooth GyroFlow Stabilization',
+    ],
+  },
+  {
+    id: 'graphics-designing',
+    title: 'GRAPHICS DESIGNING',
+    image: '/media/services/graphics_designing.jpg',
+    description:
+      'Bespoke visual identity systems, theater-grade key-art posters, typography, brand collateral, and high-impact digital marketing assets built to command attention.',
+    deliverables: [
+      'Movie & Show Teaser Key Art',
+      'Typography & Brand Identity Design',
+      'Social Media Campaign Systems',
+      'Large-Format Print & Billboard Assets',
+    ],
+  },
+  {
+    id: 'animation',
+    title: 'ANIMATION',
+    image: '/media/services/animation.jpg',
+    description:
+      'Imaginative 2D and 3D animation, stylized character design, kinetic typography, and motion graphics that explain complex ideas and craft unforgettable narrative worlds.',
+    deliverables: [
+      '3D Character Modeling & Rigging',
+      'Kinetic Motion Typography',
+      '2D/3D Explainer & Product Animations',
+      'Broadcast Package Design & Openers',
+    ],
+  },
+  {
+    id: 'vfx-post-production',
+    title: 'VFX AND POST PRODUCTION',
+    image: '/media/services/vfx_post_production.jpg',
+    description:
+      'Complete post-production finishing including seamless CGI compositing, cleanups, screen replacements, dynamic DaVinci Resolve color grading, and broadcast sound mastering.',
+    deliverables: [
+      'Advanced CGI & Live-Action Compositing',
       'DaVinci Resolve Color Grading',
-      'Dynamic Sound Design & Mixing',
-      'Fast Turnaround Social Cuts',
-      '4K Delivery in Any Format',
-    ],
-  },
-  {
-    id: 'event-management',
-    title: 'EVENT MANAGEMENT',
-    image: '/media/services/event_management.jpg',
-    description:
-      'End-to-end concert, festival, and corporate event management from technical stage execution, lighting and sound coordination to complete media coverage.',
-    deliverables: [
-      'Concert & Festival Operations',
-      'Stage Lighting & AV Coordination',
-      'Artist & Crew Media Management',
-      'Live Broadcast & Stream Ops',
-    ],
-  },
-  {
-    id: 'production',
-    title: 'PRODUCTION',
-    image: '/media/services/production.jpg',
-    description:
-      'Comprehensive film and commercial production handling every phase from script development and scouting to full crew deployment and set supervision.',
-    deliverables: [
-      'Full-Scale Shoot Logistics',
-      'Location Scouting & Permits',
-      'Casting & Talent Coordination',
-      'Turnkey Production Supervision',
+      'Green Screen & Wire Removal Cleanups',
+      'Cinematic Sound Design & 5.1 Mastering',
     ],
   },
 ];
@@ -97,24 +123,53 @@ interface CardStackSectionProps {
 export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEquipments }) => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+  const [pinState, setPinState] = useState<'before' | 'pinned' | 'after'>('before');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Track scroll position through the section to advance card index
+  // Track scroll position through the section to advance card index and maintain bulletproof viewport pinning
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const totalScrollable = rect.height - window.innerHeight;
-      if (totalScrollable <= 0) return;
+    let ticking = false;
 
-      const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
-      const newIdx = Math.min(Math.floor(progress * SERVICES_DATA.length), SERVICES_DATA.length - 1);
-      setActiveCardIndex(newIdx);
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const totalScrollable = containerRef.current.offsetHeight - windowHeight;
+
+            if (totalScrollable > 0) {
+              const progress = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
+              const newIdx = Math.min(Math.floor(progress * SERVICES_DATA.length), SERVICES_DATA.length - 1);
+              setActiveCardIndex(newIdx);
+
+              // Fixed viewport pinning states (identical to VideoScrollSection for 100% mobile reliability):
+              // - before: Section is below current viewport
+              // - pinned: Section is actively in view (position: fixed, never scrolls off or leaves blank space)
+              // - after: User has scrolled past all cards, smoothly unpins to next section
+              if (rect.top > 0) {
+                setPinState('before');
+              } else if (rect.bottom <= windowHeight) {
+                setPinState('after');
+              } else {
+                setPinState('pinned');
+              }
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const handleNextCard = () => {
@@ -127,15 +182,23 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
       id="services-stack"
       style={{
         position: 'relative',
-        height: '220vh',
+        height: '260vh',
         backgroundColor: 'var(--swatch--dark)',
       }}
     >
-      {/* Sticky Viewport Container */}
+      {/*
+        Rock-solid Viewport Container:
+        - When 'pinned': Fixed 100vw x 100vh (completely immune to iOS/Android sticky bugs).
+        - When 'before': Anchored at top of container.
+        - When 'after': Anchored at bottom of container, scrolling away naturally to next section.
+      */}
       <div
+        className="card-stack-inner"
         style={{
-          position: 'sticky',
-          top: 0,
+          position: pinState === 'pinned' ? 'fixed' : 'absolute',
+          top: pinState === 'pinned' ? 0 : pinState === 'after' ? 'auto' : 0,
+          bottom: pinState === 'after' ? 0 : 'auto',
+          left: 0,
           height: '100vh',
           width: '100%',
           display: 'flex',
@@ -143,6 +206,8 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
           justifyContent: 'center',
           overflow: 'hidden',
           padding: '0 48px',
+          zIndex: pinState === 'pinned' ? 35 : 2,
+          pointerEvents: pinState === 'pinned' ? 'auto' : 'none',
         }}
       >
         {/* Floating Orange Squiggle Path (Matching Screenshot 4) */}
@@ -176,8 +241,8 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
           className="card-stack-grid"
         >
           {/* Left Column (Matching Screenshot 4) */}
-          <div>
-            <div style={{ marginBottom: '20px' }}>
+          <div className="card-stack-left-col">
+            <div className="card-stack-header" style={{ marginBottom: '20px' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-script)',
@@ -209,6 +274,7 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
             </div>
 
             <p
+              className="card-stack-desc"
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: '16px',
@@ -222,7 +288,7 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
               built to land across every touchpoint.
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <div className="card-stack-actions" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <button
                 onClick={() => setSelectedService(SERVICES_DATA[activeCardIndex])}
                 className="btn-pill"
@@ -252,6 +318,7 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
 
             {/* Pagination Line Indicators */}
             <div
+              className="card-stack-pagination"
               style={{
                 display: 'flex',
                 gap: '8px',
@@ -449,14 +516,15 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#27201d',
-              border: '1px solid rgba(252, 242, 189, 0.18)',
+              backgroundColor: 'var(--swatch--dark-card)',
+              border: '1px solid var(--swatch--light-o20)',
               borderRadius: '24px',
               maxWidth: '680px',
               width: '100%',
               padding: '36px',
               position: 'relative',
-              boxShadow: '0 30px 80px rgba(0,0,0,0.8)',
+              boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
+              color: 'var(--swatch--light)',
             }}
           >
             <button
@@ -580,12 +648,61 @@ export const CardStackSection: React.FC<CardStackSectionProps> = ({ onNavigateEq
 
       <style>{`
         @media (max-width: 900px) {
+          .card-stack-inner {
+            padding: 76px 14px 22px !important; /* Top clearance for navbar, 14px side, 22px bottom */
+            height: 100vh !important;
+            height: 100dvh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important; /* Anchor cards firmly to the lower side */
+            box-sizing: border-box !important;
+          }
           .card-stack-grid {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            height: 100% !important;
+            max-height: calc(100dvh - 98px) !important;
+            gap: 10px !important;
+            padding: 0 !important;
+            width: 100% !important;
+          }
+          .card-stack-left-col {
+            flex-shrink: 0 !important;
+          }
+          .card-stack-header {
+            margin-bottom: 4px !important;
+          }
+          .card-stack-header h2 {
+            font-size: 26px !important;
+          }
+          .card-stack-desc {
+            display: none !important; /* Hide long paragraph on mobile so cards stay cleanly on lower side */
+          }
+          .card-stack-actions {
+            gap: 10px !important;
+            margin-bottom: 4px !important;
+          }
+          .card-stack-pagination {
+            margin-top: 6px !important;
+            margin-bottom: 4px !important;
           }
           .cards-deck-container {
-            height: 440px !important;
+            flex: 1 1 auto !important;
+            height: 52vh !important;
+            max-height: 500px !important;
+            min-height: 330px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            position: relative !important;
+          }
+          .service-card-item {
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            border-radius: 18px !important;
           }
         }
       `}</style>
