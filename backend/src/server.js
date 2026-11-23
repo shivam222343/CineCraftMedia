@@ -29,6 +29,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Enable reverse proxy trust (required for Render / cloud load balancers & OAuth HTTPS redirects)
+app.set('trust proxy', 1);
+
 // Connect to Database & Services
 await connectDB();
 initRedis();
@@ -43,10 +46,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS configuration for Frontend Admin & Public requests
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
+  process.env.CLIENT_URL,
+  'https://cinecraftmedia.com',
+  'https://www.cinecraftmedia.com',
+  'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
-];
+].filter(Boolean);
 
 app.use(
   cors({

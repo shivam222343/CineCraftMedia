@@ -28,9 +28,13 @@ const signToken = (user) => {
 };
 
 export const googleCallback = async (req, res) => {
+  const clientUrl =
+    process.env.CLIENT_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://cinecraftmedia.com'
+      : 'http://localhost:5173');
   try {
     const user = req.user;
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     if (!user) {
       return res.redirect(`${clientUrl}/admin/login?error=auth_failed`);
     }
@@ -52,7 +56,6 @@ export const googleCallback = async (req, res) => {
     // Redirect to Admin Dashboard
     return res.redirect(`${clientUrl}/admin/dashboard?token=${token}${needsPasswordParam}`);
   } catch (error) {
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     return res.redirect(`${clientUrl}/admin/login?error=${encodeURIComponent(error.message)}`);
   }
 };

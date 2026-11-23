@@ -25,7 +25,11 @@ router.get(
 // Google OAuth callback with custom handler for pending approvals
 router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', { session: false }, (err, user, info) => {
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const clientUrl =
+      process.env.CLIENT_URL ||
+      (process.env.NODE_ENV === 'production'
+        ? 'https://cinecraftmedia.com'
+        : 'http://localhost:5173');
     if (err) {
       return res.redirect(`${clientUrl}/admin/login?error=${encodeURIComponent(err.message)}`);
     }

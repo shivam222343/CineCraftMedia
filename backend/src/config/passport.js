@@ -7,7 +7,11 @@ import { isEmailApproved, createAccessRequest } from '../services/notificationSe
 export const configurePassport = () => {
   const clientID = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+  const callbackURL =
+    process.env.GOOGLE_CALLBACK_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://cinecraftmedia.onrender.com/api/auth/google/callback'
+      : 'http://localhost:5000/api/auth/google/callback');
 
   if (!clientID || !clientSecret || clientID.includes('your_google_client_id')) {
     console.warn('[Auth Warning] Google OAuth Client ID or Secret not configured in .env. Admin bypass/dev auth available.');
@@ -20,6 +24,7 @@ export const configurePassport = () => {
         clientID,
         clientSecret,
         callbackURL,
+        proxy: true,
         passReqToCallback: true,
       },
       async (req, accessToken, refreshToken, profile, done) => {
