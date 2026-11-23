@@ -14,6 +14,17 @@ import { EquipmentsPage } from './Components/EquipmentsPage';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ThemeToggle } from './Components/ThemeToggle';
+import { NotFoundPage } from './Components/NotFoundPage';
+
+type AppRoute = 'home' | 'equipments' | 'admin' | 'not-found';
+
+const resolveRoute = (pathname: string): AppRoute => {
+  const cleanPath = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  if (cleanPath === '/' || cleanPath === '/home') return 'home';
+  if (cleanPath === '/admin' || cleanPath.startsWith('/admin/')) return 'admin';
+  if (cleanPath === '/equipments' || cleanPath.startsWith('/equipments/')) return 'equipments';
+  return 'not-found';
+};
 
 // Default Color themes for each nav destination's organic stroke transition
 const SECTION_TRANSITION_COLORS: Record<string, string> = {
@@ -30,10 +41,9 @@ const SECTION_TRANSITION_COLORS: Record<string, string> = {
 
 function AppContent() {
   const { cmsTheme } = useTheme();
-  const [currentRoute, setCurrentRoute] = useState<'home' | 'equipments' | 'admin'>(() => {
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => {
     if (typeof window !== 'undefined') {
-      if (window.location.pathname.startsWith('/admin')) return 'admin';
-      if (window.location.pathname.startsWith('/equipments')) return 'equipments';
+      return resolveRoute(window.location.pathname);
     }
     return 'home';
   });
@@ -51,13 +61,7 @@ function AppContent() {
   // Listen to browser forward/back buttons & dev keyboard shortcut (Alt + A) for Admin
   useEffect(() => {
     const handlePopState = () => {
-      if (window.location.pathname.startsWith('/admin')) {
-        setCurrentRoute('admin');
-      } else if (window.location.pathname.startsWith('/equipments')) {
-        setCurrentRoute('equipments');
-      } else {
-        setCurrentRoute('home');
-      }
+      setCurrentRoute(resolveRoute(window.location.pathname));
       window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
@@ -68,7 +72,7 @@ function AppContent() {
           window.history.pushState({}, '', '/');
           setCurrentRoute('home');
         } else {
-          window.history.pushState({}, '', '/admin');
+          window.history.pushState({}, '', '/admin/dashboard');
           setCurrentRoute('admin');
         }
       }
@@ -107,8 +111,8 @@ function AppContent() {
           window.history.pushState({}, '', '/equipments');
         }
       } else {
-        // If navigating away from equipments back to home
-        if (currentRoute === 'equipments') {
+        // If navigating away from equipments or 404 back to home
+        if (currentRoute === 'equipments' || currentRoute === 'not-found') {
           setCurrentRoute('home');
           if (window.location.pathname !== '/') {
             window.history.pushState({}, '', '/');
@@ -118,8 +122,8 @@ function AppContent() {
         if (sectionId === 'home' || sectionId === 'hero') {
           window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
-          // If we were on equipments, wait 60ms for home DOM to mount before scrolling
-          const delay = currentRoute === 'equipments' ? 60 : 0;
+          // Wait for home DOM to mount before scrolling
+          const delay = (currentRoute === 'equipments' || currentRoute === 'not-found') ? 60 : 0;
           setTimeout(() => {
             const targetEl = document.getElementById(sectionId);
             if (targetEl) {
@@ -173,6 +177,30 @@ function AppContent() {
           {/* Global Theme Toggle */}
           <ThemeToggle />
         </>
+      ) : currentRoute === 'not-found' ? (
+        <NotFoundPage
+          onBackToHome={() => {
+            if (window.location.pathname !== '/') {
+              window.history.pushState({}, '', '/');
+            }
+            setCurrentRoute('home');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+          onNavigateEquipments={() => {
+            if (window.location.pathname !== '/equipments') {
+              window.history.pushState({}, '', '/equipments');
+            }
+            setCurrentRoute('equipments');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+          onNavigateAdmin={() => {
+            if (window.location.pathname !== '/admin/dashboard') {
+              window.history.pushState({}, '', '/admin/dashboard');
+            }
+            setCurrentRoute('admin');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+        />
       ) : (
         <>
           {/* Main Navigation with Mega Dropdowns & Custom Underlines */}
